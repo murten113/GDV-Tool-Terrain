@@ -60,7 +60,7 @@ public class NewProjectPopup : MonoBehaviour
         Debug.Log("[MOCKUP] No actual file creation - just mockup!");
 
         // Load main scene (this is the only real action)
-        MainMenuButtons mainMenu = FindObjectOfType<MainMenuButtons>();
+        MainMenuButtons mainMenu = FindFirstObjectByType<MainMenuButtons>();
         if (mainMenu != null)
         {
             mainMenu.LoadMainScene();
