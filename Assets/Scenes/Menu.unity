@@ -709,10 +709,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1821187737}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 80, y: -13.41}
+  m_SizeDelta: {x: 160, y: 26.82}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &131511366
 MonoBehaviour:
@@ -962,7 +962,7 @@ GameObject:
   - component: {fileID: 402750920}
   - component: {fileID: 402750919}
   m_Layer: 5
-  m_Name: ContinueButton
+  m_Name: ContinueButtonN
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2246,6 +2246,8 @@ MonoBehaviour:
   - Desert Landscape
   - Island Paradise
   - Urban District
+  - baba
+  - metesting
 --- !u!114 &926163492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3873,6 +3875,7 @@ GameObject:
   - component: {fileID: 1456354032}
   - component: {fileID: 1456354034}
   - component: {fileID: 1456354033}
+  - component: {fileID: 1456354035}
   m_Layer: 5
   m_Name: NewProjectPopup
   m_TagString: Untagged
@@ -3944,6 +3947,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1456354031}
   m_CullTransparentMesh: 1
+--- !u!114 &1456354035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1456354031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f33923d7334582243bfdd8d75ac334f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectNameInput: {fileID: 720246573}
+  savePathInput: {fileID: 1490088465}
+  continueButton: {fileID: 402750919}
+  cancelButton: {fileID: 579543002}
+  defaultProjectName: New Project
+  defaultSavePath: C:/Projects/
 --- !u!1 &1490088463
 GameObject:
   m_ObjectHideFlags: 0
@@ -4712,7 +4733,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1821187737
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5539,6 +5560,56 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &2039478606
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2039478608}
+  - component: {fileID: 2039478607}
+  m_Layer: 0
+  m_Name: MenuManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2039478607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039478606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5474033400c698142975b86bf32e259f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  newProjectButton: {fileID: 1341739551}
+  loadProjectButton: {fileID: 2034373573}
+  exitButton: {fileID: 554390080}
+  newProjectPopup: {fileID: 1456354031}
+  loadProjectPopup: {fileID: 926163489}
+  mainSceneName: main
+--- !u!4 &2039478608
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039478606}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 407.4111, y: 184.81586, z: -2.3017287}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2074769684
 GameObject:
   m_ObjectHideFlags: 0
@@ -5552,12 +5623,12 @@ GameObject:
   - component: {fileID: 2074769687}
   - component: {fileID: 2074769686}
   m_Layer: 5
-  m_Name: ContinueButton
+  m_Name: ContinueButtonL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2074769685
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5667,3 +5738,4 @@ SceneRoots:
   - {fileID: 1352458394}
   - {fileID: 1147529904}
   - {fileID: 707893589}
+  - {fileID: 2039478608}
