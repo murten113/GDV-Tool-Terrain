@@ -85,9 +85,25 @@ public class LoadProjectPopup : MonoBehaviour
             nameText.text = projectName;
     }
     
-    // Update is called once per frame
-    void Update()
+    private void OnNewProjectSelected(strng projectName)
     {
-        
+        string directoryPath = directoryPathInput != null ? directoryPathInput.text : defaultDirectoryPath;
+
+
+        //MOCK
+        Debug.Log($"[MOCKUP] Would load project: {projectName}");
+        Debug.Log($"  From directory: {directoryPath}");
+        Debug.Log("[MOCKUP] No actual file loading - just mockup!");
+
+        //load Main scene
+        MainMenuButtons mainMenu = FindObejctOfType<MainMenuButtons>
+        if (mainMenu != null)
+        {
+            mainMenu.LoadMainScene();
+        }
+        else
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("main");
+        }
     }
 }
