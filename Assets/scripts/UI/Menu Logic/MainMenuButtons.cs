@@ -21,7 +21,7 @@ public class MainMenuButtons : MonoBehaviour
     private void Start()
     {
         // Add listeners to buttons
-        if (newProjectButton != null){
+        if (newProjectButton != null)
             newProjectButton.onClick.AddListener(OnNewProjectClicked);
 
         if (loadProjectButton != null)
@@ -48,7 +48,7 @@ public class MainMenuButtons : MonoBehaviour
 
     private void OnLoadProjectClicked()
     {
- if (loadProjectPopup != null)
+        if (loadProjectPopup != null)  // Removed the extra { here
         {
             loadProjectPopup.SetActive(true);
             // Refresh project list when opening (mockup for now)
@@ -71,7 +71,7 @@ public class MainMenuButtons : MonoBehaviour
     }
 
 
-        public void LoadMainScene()
+    public void LoadMainScene()
     {
         SceneManager.LoadScene(mainSceneName);
     }
