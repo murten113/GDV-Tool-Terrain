@@ -1,12 +1,14 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 // This script is used to control the collapsible panel in the UI.
-
 public class CollapsiblePanel : MonoBehaviour
 {
-
     [Header("Panel Settings")]
     [SerializeField] private RectTransform panelRectTransform;
+    
+    [Header("Toggle Button")]
+    [SerializeField] private Button toggleButton; // Drag your toggle button here in Inspector
 
     [Header("States")]
     private bool isExpanded = true;
@@ -24,6 +26,12 @@ public class CollapsiblePanel : MonoBehaviour
 
         //sets up the collapsed position
         SetupCollapsedPosition();
+        
+        // Wire up toggle button if assigned
+        if (toggleButton != null)
+        {
+            toggleButton.onClick.AddListener(Toggle);
+        }
     }
 
     //sets up the collapsed position
@@ -52,7 +60,6 @@ public class CollapsiblePanel : MonoBehaviour
     private void MoveToTargetPosition()
     {
         Vector2 targetPosition = isExpanded ? expandedPosition : collapsedPosition;
-        
         panelRectTransform.anchoredPosition = targetPosition;
     }
 }
