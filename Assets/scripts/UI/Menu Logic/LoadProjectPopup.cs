@@ -96,7 +96,7 @@ public class LoadProjectPopup : MonoBehaviour
         Debug.Log("[MOCKUP] No actual file loading - just mockup!");
 
         //load Main scene
-        MainMenuButtons mainMenu = FindObjectOfType<MainMenuButtons>();  // Fixed: FindObjectOfType (correct spelling), added (), added semicolon
+        MainMenuButtons mainMenu = FindFirstObjectByType<MainMenuButtons>();
         if (mainMenu != null)
         {
             mainMenu.LoadMainScene();
