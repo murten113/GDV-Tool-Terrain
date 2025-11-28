@@ -70,7 +70,19 @@ public class LoadProjectPopup : MonoBehaviour
 
     private void CreateProjectListItem(string projectName)
     {
-        
+        GameObject listItem = Instantiate(projectListItemPrefab, projectListContainer);
+        projectListItems.Add(listItem);
+
+        Button itemButton = listItem.Getcomponent<Button>();
+        if (itemButton == null)
+            itemButton = listItem.GetComponentInChildren<Button>();
+
+        if (itemButton != null)
+            itemButton.onClick.AddListener(() => OnNewProjectSelected(projectName));
+
+        TextMeshProUGUI nameText = listItem.GetComponentInChildren<TextMeshProUGUI>();
+        if (nameText != null)
+            nameText.text = projectName;
     }
     
     // Update is called once per frame
