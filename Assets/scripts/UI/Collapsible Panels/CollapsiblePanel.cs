@@ -10,8 +10,8 @@ public class CollapsiblePanel : MonoBehaviour
 
     [Header("States")]
     private bool isExpanded = true;
-    private Vector2 expandedPosition;
-    private Vector2 collapsedPosition;
+    protected Vector2 expandedPosition;
+    protected Vector2 collapsedPosition;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
