@@ -26,7 +26,7 @@ public class LoadProjectPopup : MonoBehaviour
         "Urban District"
     };
     
-    private List<GameObject> projectListItems = new List<GameObject>();  // Fixed: List, GameObject, removed semicolon before =
+    private List<GameObject> projectListItems = new List<GameObject>();
 
     private void Start()
     {
@@ -52,12 +52,11 @@ public class LoadProjectPopup : MonoBehaviour
         string directoryPath = directoryPathInput != null ? directoryPathInput.text : defaultDirectoryPath;
         
         Debug.Log($"[MOCKUP] scan direct: {directoryPath}");
-        Debug.Log("[MOCKUP] not reading disk using hardcoded list");  // Fixed: Added semicolon
+        Debug.Log("[MOCKUP] not reading disk using hardcoded list");
 
         if (projectListContainer == null || projectListItemPrefab == null)
         {
-            Debug.Log("Proj list cont/pref not assigned");  // Fixed: Added semicolon
-            return;
+            Debug.Log("Proj list cont/pref not assigned");
         }
 
         //create project item [MOCKUP]
@@ -73,19 +72,19 @@ public class LoadProjectPopup : MonoBehaviour
         GameObject listItem = Instantiate(projectListItemPrefab, projectListContainer);
         projectListItems.Add(listItem);
 
-        Button itemButton = listItem.GetComponent<Button>();  // Fixed: GetComponent (capital C)
+        Button itemButton = listItem.GetComponent<Button>(); 
         if (itemButton == null)
             itemButton = listItem.GetComponentInChildren<Button>();
 
         if (itemButton != null)
-            itemButton.onClick.AddListener(() => OnProjectSelected(projectName));  // Fixed: renamed from OnNewProjectSelected
+            itemButton.onClick.AddListener(() => OnProjectSelected(projectName)); 
 
         TextMeshProUGUI nameText = listItem.GetComponentInChildren<TextMeshProUGUI>();
         if (nameText != null)
             nameText.text = projectName;
     }
     
-    private void OnProjectSelected(string projectName)  // Fixed: OnProjectSelected, string (was strng)
+    private void OnProjectSelected(string projectName)
     {
         string directoryPath = directoryPathInput != null ? directoryPathInput.text : defaultDirectoryPath;
 
@@ -110,18 +109,17 @@ public class LoadProjectPopup : MonoBehaviour
     private void ClearProjectList()
     {
         //clear all items in list
-        foreach (GameObject item in projectListItems)  // Fixed: item (was iten)
+        foreach (GameObject item in projectListItems) 
         {
-            if (item != null)  // Fixed: item (was referencing undeclared variable)
+            if (item != null) 
                 Destroy(item);
         }
-        projectListItems.Clear();  // Fixed: Added parentheses ()
-    }
+        projectListItems.Clear(); 
 
     private void OnCancelClicked()
     {
         //close popup
-        gameObject.SetActive(false);  // Fixed: gameObject (capital O)
+        gameObject.SetActive(false); 
     }
 
     private void OnDestroy()
