@@ -1,16 +1,19 @@
 using UnityEngine;
 
-public class BrushSettingsPanel : MonoBehaviour
+public class BrushSettingsPanel : CollapsiblePanel
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [Header("Brush Settings Specific")]
+    [SerializeField] private float panelHeight = 180f;
+    protected override void SetupCollapsedPosition()
     {
-        
+        base.SetupCollapsedPosition();
+
+        // Collapsed: hide panel below (off-screen)
+        collapsedPosition = new Vector2(expandedPosition.x, -panelHeight);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnToggleButtonClicked()
     {
-        
+        Toggle();
     }
 }
