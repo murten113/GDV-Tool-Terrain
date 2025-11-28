@@ -106,4 +106,26 @@ public class LoadProjectPopup : MonoBehaviour
             UnityEngine.SceneManagement.SceneManager.LoadScene("main");
         }
     }
+
+    private void ClearProjectList()
+    {
+        //clear all items in list
+        foreach (GameObject iten in projectListItems)
+        {
+            if (item != null)
+                Destroy(item);
+        }
+        projectListItems.Clear;
+    }
+
+    private void OnCancelClicked()
+    {
+        //close popup
+        gameobject.SetActive(false);
+    }
+
+    private void OnDestroy()
+    {
+        ClearProjectList();
+    }
 }
