@@ -115,7 +115,7 @@ public class LoadProjectPopup : MonoBehaviour
                 Destroy(item);
         }
         projectListItems.Clear(); 
-
+    }
     private void OnCancelClicked()
     {
         //close popup
