@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class MainMenuPanel : CollapsiblePanel
 {
-
     [Header("Main Menu Specific")]
     [SerializeField] private float panelWidth = 250f;
 
@@ -10,6 +9,7 @@ public class MainMenuPanel : CollapsiblePanel
     {
         base.SetupCollapsedPosition();
 
+        // Collapsed: hide panel to the left (off-screen)
         collapsedPosition = new Vector2(-panelWidth, expandedPosition.y);
     }
 
