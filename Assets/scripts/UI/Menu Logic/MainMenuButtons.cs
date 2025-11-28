@@ -35,4 +35,15 @@ public class MainMenuButtons : MonoBehaviour
             loadProjectPopup.SetActive(false);
     }
 
+
+    private void OnNewProjectClicked()
+    {
+
+    }
+
+    private void OnLoadProjectClicked()
+    {
+
+    }
+
 }
