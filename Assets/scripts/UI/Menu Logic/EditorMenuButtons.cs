@@ -56,37 +56,48 @@ public class EditorMenuButtons : MonoBehaviour
         // TerrainSaveLoadManager.Instance.SaveProject(currentProjectPath);
     }
 
-    private void OnLoadClicked
+    private void OnLoadClicked()
     {
         if (loadProjectPopup != null)
         {
             loadProjectPopup.SetActive(true);
 
-            LoadProjectPopup = loadPopup = loadProjectPopup.GetComponent<LoadProjectPopup>();
+            LoadProjectPopup loadPopup = loadProjectPopup.GetComponent<LoadProjectPopup>();
             if (loadPopup != null)
             {
                 loadPopup.RefreshProjectList();
             }
         }
-        else
-        {
-            Debug.LogWarning("Load Proj Pop not assigned")
-        }
     }
     
     private void OnExportAsClicked()
     {
-        if (exportAsPopup != nu)
+        if (exportAsPopup != null)
         {
             exportAsPopup.SetActive(true);
 
-             // Refresh export popup if needed
+            // Refresh export popup if needed
             ExportAsPopup exportPopup = exportAsPopup.GetComponent<ExportAsPopup>();
             if (exportPopup != null)
             {
-                //initialization here
+                // Any initialization can go here
             }
         }
     }
 
+    private void OnQuitToMenuClicked()
+    {
+        // Load menu scene
+        SceneManager.LoadScene(menuSceneName);
+    }
+
+    private void OnQuitClicked()
+    {
+        Application.Quit();
+
+        // For testing in editor
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #endif
+    }
 }
