@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class MainMenuButtons : MonoBehaviour
 {
@@ -14,6 +16,7 @@ public class MainMenuButtons : MonoBehaviour
 
     [Header("Scene Settings")]
     [SerializeField] private string mainSceneName = "main";
+
 
     private void Start()
     {
@@ -38,12 +41,38 @@ public class MainMenuButtons : MonoBehaviour
 
     private void OnNewProjectClicked()
     {
-
+        if (newProjectPopup != null)
+            newProjectPopup.SetActive(true);
     }
+
 
     private void OnLoadProjectClicked()
     {
-
+ if (loadProjectPopup != null)
+        {
+            loadProjectPopup.SetActive(true);
+            // Refresh project list when opening (mockup for now)
+            LoadProjectPopup loadPopup = loadProjectPopup.GetComponent<LoadProjectPopup>();
+            if (loadPopup != null)
+            {
+                loadPopup.RefreshProjectList();
+            }
+        }
     }
 
+
+    private void OnExitClicked()
+    {
+        Application.Quit();
+        
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #endif
+    }
+
+
+        public void LoadMainScene()
+    {
+        SceneManager.LoadScene(mainSceneName);
+    }
 }
