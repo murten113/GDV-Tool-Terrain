@@ -54,6 +54,23 @@ public class LoadProjectPopup : MonoBehaviour
         Debug.Log($"[MOCKUP] scan direct: {directoryPath}");
         Debug.Log("[MOCKUP] not reading disk using hardcoded list")
 
+        if (projectListContainer == null || projectListItemPrefab == null)
+        {
+            Debug.Log("Proj list cont/pref not assigned")
+            return;
+        }
+
+        //create project item [MOCKUP]
+        foreach (string projectName in mockProjectNames)
+        {
+            CreateProjectListItem(projectName);
+        }
+
+    }
+
+    private void CreateProjectListItem(string projectName)
+    {
+        
     }
     
     // Update is called once per frame
