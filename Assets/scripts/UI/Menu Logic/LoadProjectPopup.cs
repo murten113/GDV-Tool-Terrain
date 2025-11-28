@@ -26,7 +26,25 @@ public class LoadProjectPopup : MonoBehaviour
         "Urban District"
     };
     
-    
+    private list<gameobject> projectListItems; = new list<gameobject>();
+
+    private void Start()
+    {
+        //set the default directory path
+        if (directoryPathInput != null)
+            directoryPathInput.text = defaultDirectoryPath;
+
+        //Button listeners
+        if (cancelButton != null)
+            cancelButton.onClick.AddListener(OnCancelClicked);
+
+        if (refreshButton != null)
+            refreshButton.onClick.AddListener(RefreshProjectList);
+
+        RefreshProjectList();
+    }
+
+    public void RefreshProjectList()
     
     // Update is called once per frame
     void Update()
