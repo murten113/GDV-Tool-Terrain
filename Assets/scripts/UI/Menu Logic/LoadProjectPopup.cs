@@ -45,6 +45,16 @@ public class LoadProjectPopup : MonoBehaviour
     }
 
     public void RefreshProjectList()
+    {
+        ClearProjectList();
+
+        //Get directory path from input field (not working yet)
+        string directoryPath = directoryPathInput != null ? directoryPathInput.text : defaultDirectoryPath;
+        
+        Debug.Log($"[MOCKUP] scan direct: {directoryPath}");
+        Debug.Log("[MOCKUP] not reading disk using hardcoded list")
+
+    }
     
     // Update is called once per frame
     void Update()
