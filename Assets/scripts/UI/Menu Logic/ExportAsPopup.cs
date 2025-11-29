@@ -28,4 +28,31 @@ public class ExportAsPopup : MonoBehaviour
             cancelButton.onClick.AddListener(OnCancelClicked);  
     }
 
+    private void OnExportClicked()
+    {
+        string exportPath = exportPathInput != null ? exportPathInput.text : defaultExportPath;
+
+        // MOCKUP: Just log what would happen
+        Debug.Log("[MOCKUP] Export As clicked");
+        Debug.Log($"  Export Path: {exportPath}");
+        Debug.Log("[MOCKUP] No actual export - just mockup!");
+
+        // TODO: In real implementation, export terrain here
+        // TerrainSaveLoadManager.Instance.ExportTerrain(exportPath, format);
+
+        // Close popup
+        gameObject.SetActive(false);
+    }
+
+    private void OnCancelClicked()
+    {
+        gameObject.SetActive(false);
+    }
+
+    private void OnEnable()
+    {
+        if (exportPathInput != null)
+            exportPathInput.text = defaultExportPath;
+    }
+
 }

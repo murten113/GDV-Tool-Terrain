@@ -1577,6 +1577,58 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 374893576}
   m_CullTransparentMesh: 1
+--- !u!1 &451637428
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 451637430}
+  - component: {fileID: 451637429}
+  m_Layer: 0
+  m_Name: EditorMenuManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &451637429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451637428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea60aa46f033a5f41b0636d62e9f4591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  saveButton: {fileID: 2035157505}
+  loadButton: {fileID: 1244555864}
+  exportAsButton: {fileID: 1034225043}
+  quitToMenuButton: {fileID: 2085905839}
+  quitButton: {fileID: 888260425}
+  loadProjectPopup: {fileID: 0}
+  exportAsPopup: {fileID: 0}
+  menuSceneName: Menu
+--- !u!4 &451637430
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451637428}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 267.24857, y: 149.64777, z: -2.6265295}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &536004651
 GameObject:
   m_ObjectHideFlags: 0
@@ -3745,8 +3797,8 @@ RectTransform:
   - {fileID: 2035157504}
   - {fileID: 1244555863}
   - {fileID: 1034225042}
-  - {fileID: 888260424}
   - {fileID: 2085905837}
+  - {fileID: 888260424}
   - {fileID: 2091094572}
   m_Father: {fileID: 234780920}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4927,3 +4979,4 @@ SceneRoots:
   - {fileID: 2070762813}
   - {fileID: 234780920}
   - {fileID: 1067839590}
+  - {fileID: 451637430}
