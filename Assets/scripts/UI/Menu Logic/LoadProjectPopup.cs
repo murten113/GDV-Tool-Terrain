@@ -57,6 +57,7 @@ public class LoadProjectPopup : MonoBehaviour
         if (projectListContainer == null || projectListItemPrefab == null)
         {
             Debug.Log("Proj list cont/pref not assigned");
+            return;
         }
 
         //create project item [MOCKUP]
@@ -70,6 +71,9 @@ public class LoadProjectPopup : MonoBehaviour
     private void CreateProjectListItem(string projectName)
     {
         GameObject listItem = Instantiate(projectListItemPrefab, projectListContainer);
+
+        listItem.name = !string.IsNullOrWhiteSpace(projectName) ? projectName : "ProjectItem";
+
         projectListItems.Add(listItem);
 
         Button itemButton = listItem.GetComponent<Button>(); 
