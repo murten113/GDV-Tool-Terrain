@@ -15,12 +15,23 @@ public class EditorMenuButtons : MonoBehaviour
     [Header("Popup Panels")]
     [SerializeField] private GameObject loadProjectPopup;
     [SerializeField] private GameObject exportAsPopup;
-    
+
     [Header("Scene Settings")]
     [SerializeField] private string menuSceneName = "Menu";
 
+    [Header("References")]
+    [SerializeField] private TerrainSaveLoadManager saveLoadManager;
+    [SerializeField] private TerrainManager terrainManager;
+
     private void Start()
     {
+        // Find references if not assigned
+        if (saveLoadManager == null)
+            saveLoadManager = FindFirstObjectByType<TerrainSaveLoadManager>();
+
+        if (terrainManager == null)
+            terrainManager = FindFirstObjectByType<TerrainManager>();
+
         // Button listeners
         if (saveButton != null)
             saveButton.onClick.AddListener(OnSaveClicked);
@@ -47,13 +58,24 @@ public class EditorMenuButtons : MonoBehaviour
 
     private void OnSaveClicked()
     {
-        // MOCKUP: Just log what would happen
-        Debug.Log("[MOCKUP] Save button clicked");
-        Debug.Log("[MOCKUP] Would save current project to: [Current Project Path]");
-        Debug.Log("[MOCKUP] No actual file saving - just mockup!");
+        Debug.Log("Save button clicked");
 
-        // TODO: In real implementation, call save function
-        // TerrainSaveLoadManager.Instance.SaveProject(currentProjectPath);
+        if (saveLoadManager == null || terrainManager == null)
+        {
+            Debug.LogError("SaveLoadManager or TerrainManager not found!");
+            return;
+        }
+
+        // Use default save path for now
+        string defaultPath = Application.dataPath + "/../SavedProjects/current_project.json";
+
+        // FIXED: project first, then filePath
+        bool success = saveLoadManager.SaveProject(terrainManager.CurrentProject, defaultPath);
+
+        if (success)
+            Debug.Log($"Project saved to: {defaultPath}");
+        else
+            Debug.LogError("Failed to save project!");
     }
 
     private void OnLoadClicked()
@@ -69,7 +91,30 @@ public class EditorMenuButtons : MonoBehaviour
             }
         }
     }
-    
+
+    // Public method to load a project file (called by LoadProjectPopup or other UI)
+    public void LoadProjectFile(string filePath)
+    {
+        if (saveLoadManager == null || terrainManager == null)
+        {
+            Debug.LogError("SaveLoadManager or TerrainManager not found!");
+            return;
+        }
+
+        TerrainProject loadedProject = saveLoadManager.LoadProject(filePath);
+
+        if (loadedProject != null)
+        {
+            // FIXED: use LoadTerrain instead of LoadProject
+            terrainManager.LoadTerrain(loadedProject);
+            Debug.Log($"Project loaded from: {filePath}");
+        }
+        else
+        {
+            Debug.LogError("Failed to load project!");
+        }
+    }
+
     private void OnExportAsClicked()
     {
         if (exportAsPopup != null)
@@ -96,8 +141,8 @@ public class EditorMenuButtons : MonoBehaviour
         Application.Quit();
 
         // For testing in editor
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-        #endif
+#endif
     }
 }
