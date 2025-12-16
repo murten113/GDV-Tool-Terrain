@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class TerrainSaveLoadManager : MonoBehaviour
 {
-
-    // Singleton instance
     private static TerrainSaveLoadManager instance;
     public static TerrainSaveLoadManager Instance
     {
@@ -19,7 +17,6 @@ public class TerrainSaveLoadManager : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private string defaultSaveDirectory = "Projects";
 
-    // Ensure singleton instance
     private void Awake()
     {
         if (instance == null)
@@ -28,12 +25,14 @@ public class TerrainSaveLoadManager : MonoBehaviour
             Destroy(gameObject);
     }
 
-    // Get or create the save directory path
-    public string GetSaveDirectory()
+    // Get the full path for saving projects
+    private string GetSaveDirectory()
     {
         string path = Path.Combine(Application.persistentDataPath, defaultSaveDirectory);
         if (!Directory.Exists(path))
+        {
             Directory.CreateDirectory(path);
+        }
         return path;
     }
 
@@ -44,18 +43,19 @@ public class TerrainSaveLoadManager : MonoBehaviour
         return Path.Combine(GetSaveDirectory(), fileName);
     }
 
-
-    // Save a TerrainProject to a file
+    // Save project to file
     public bool SaveProject(TerrainProject project, string filePath = null)
     {
         if (project == null || project.terrainData == null)
         {
-            Debug.LogError("Cannot save project: Project or terrain data is null.");
+            Debug.LogError("Cannot save null project or terrain data!");
             return false;
         }
 
+        // Update last modified date
         project.UpdateLastModified();
 
+        // Use provided path or generate from project name
         if (string.IsNullOrEmpty(filePath))
         {
             filePath = GetProjectFilePath(project.projectName);
@@ -63,61 +63,73 @@ public class TerrainSaveLoadManager : MonoBehaviour
 
         try
         {
+            // Convert to JSON
             string json = JsonUtility.ToJson(project, true);
 
+            // Write to file
             File.WriteAllText(filePath, json);
 
-            Debug.Log($"Project '{project.projectName}' saved successfully to {filePath}");
+            Debug.Log($"Project saved successfully to: {filePath}");
             return true;
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Failed to save project '{project.projectName}': {e.Message}");
+            Debug.LogError($"Failed to save project: {e.Message}");
             return false;
         }
     }
 
-    // Load a TerrainProject from a file
+    // Load project from file
     public TerrainProject LoadProject(string filePath)
     {
         if (!File.Exists(filePath))
         {
-            Debug.LogError($"Cannot load project: File does not exist at {filePath}");
+            Debug.LogError($"Project file not found: {filePath}");
             return null;
         }
+
         try
         {
+            // Read JSON from file
             string json = File.ReadAllText(filePath);
 
+            // Parse JSON to TerrainProject
             TerrainProject project = JsonUtility.FromJson<TerrainProject>(json);
+
+            // Initialize terrain data if needed
             if (project.terrainData != null)
             {
-                if (project.terrainData.heightMap == null || project.terrainData.heightMap.Length != project.terrainData.width * project.terrainData.height)
+                // Ensure heightmap is initialized
+                if (project.terrainData.heightMap == null ||
+                    project.terrainData.heightMap.Length != project.terrainData.width * project.terrainData.height)
                 {
                     project.terrainData.InitializeFlat();
                 }
             }
 
-            Debug.Log($"Project '{project.projectName}' loaded successfully from {filePath}");
+            Debug.Log($"Project loaded successfully from: {filePath}");
             return project;
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Failed to load project from '{filePath}': {e.Message}");
+            Debug.LogError($"Failed to load project: {e.Message}");
             return null;
         }
     }
 
+    // Get all project files in save directory
     public string[] GetAllProjectFiles()
     {
-        string saveDir = GetSaveDirectory();
-        if (!Directory.Exists(saveDir))
+        string directory = GetSaveDirectory();
+        if (!Directory.Exists(directory))
         {
             return new string[0];
         }
-        return Directory.GetFiles(saveDir, "*.terrain");
+
+        return Directory.GetFiles(directory, "*.terrain");
     }
 
+    // Get project name from file path
     public string GetProjectNameFromPath(string filePath)
     {
         string fileName = Path.GetFileNameWithoutExtension(filePath);
