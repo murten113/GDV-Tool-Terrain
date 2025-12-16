@@ -99,6 +99,13 @@ public class TerrainMeshGenerator : MonoBehaviour
         // Assign mesh to MeshFilter
         meshFilter.mesh = terrainMesh;
 
+        // Add MeshCollider for raycasting
+        MeshCollider meshCollider = GetComponent<MeshCollider>();
+        if (meshCollider == null)
+            meshCollider = gameObject.AddComponent<MeshCollider>();
+
+        meshCollider.sharedMesh = terrainMesh;
+
         // Set default material if none exists
         if (meshRenderer.sharedMaterial == null)
         {

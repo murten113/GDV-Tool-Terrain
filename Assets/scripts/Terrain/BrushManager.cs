@@ -31,7 +31,7 @@ public class BrushManager : MonoBehaviour
             Debug.LogError("BrushManager: TerrainRaycaster not found");
         }
 
-        UpdateBrushSetting();
+        UpdateBrushSettings();
     }
 
     private void Update()
@@ -74,11 +74,48 @@ public class BrushManager : MonoBehaviour
     {
         if (raycaster == null || currentBrush == null)
             return;
+
         Vector3 hitPoint;
         Vector3 hitNormal;
+
         if (raycaster.RaycastTerrain(out hitPoint, out hitNormal))
         {
             currentBrush.ApplyBrush(hitPoint);
         }
     }
+
+    public void SetBrushSize(float size)
+    {
+        brushSize = size;
+        UpdateBrushSettings();
+    }
+
+    public void SetBrushStrength(float strength)
+    {
+        brushStrength = strength;
+        UpdateBrushSettings();
+    }
+
+    public void UpdateBrushSettings()
+    {
+        if (raiseBrush != null)
+        {
+            raiseBrush.brushSize = brushSize;
+            raiseBrush.brushStrength = brushStrength;
+        }
+
+        if (lowerBrush != null)
+        {
+            lowerBrush.brushSize = brushSize;
+            lowerBrush.brushStrength = brushStrength;
+        }
+
+        if (flattenBrush != null)
+        {
+            flattenBrush.brushSize = brushSize;
+            flattenBrush.brushStrength = brushStrength;
+        }
+    }
+    public float GetBrushSize() => brushSize;
+    public float GetBrushStrength() => brushStrength;
 }
