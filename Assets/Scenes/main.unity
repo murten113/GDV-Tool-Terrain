@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 364bbcb97bca5f54786aa693e5eb16eb, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 20201, guid: 0000000000000000f000000000000000, type: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 6d806bfeca23ced4c94ecad615a78e99, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -5960,6 +5960,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1199876353}
   - component: {fileID: 1199876352}
+  - component: {fileID: 1199876354}
   m_Layer: 0
   m_Name: TerrainManager
   m_TagString: Untagged
@@ -5983,7 +5984,7 @@ MonoBehaviour:
   terrainHeight: 100
   horizontalScale: 1
   verticalScale: 10
-  meshGenerator: {fileID: 0}
+  meshGenerator: {fileID: 1199876354}
 --- !u!4 &1199876353
 Transform:
   m_ObjectHideFlags: 0
@@ -5999,6 +6000,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1199876354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199876351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe0b3837cafe2f40b9d4316697da393, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1221633921
 GameObject:
   m_ObjectHideFlags: 0
@@ -9579,7 +9592,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 1
+  orthographic: 0
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
