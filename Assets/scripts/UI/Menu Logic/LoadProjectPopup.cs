@@ -2,10 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using System.IO;
 
 public class LoadProjectPopup : MonoBehaviour
 {
-
     [Header("UI References")]
     [SerializeField] private TMP_InputField directoryPathInput;
     [SerializeField] private Button refreshButton;
@@ -13,28 +13,28 @@ public class LoadProjectPopup : MonoBehaviour
     [SerializeField] private Transform projectListContainer;
     [SerializeField] private GameObject projectListItemPrefab;
 
-    [Header("Mockup Settings")]
-    [SerializeField] private string defaultDirectoryPath = "C:/Projects/";
-    
-    // MOCKUP: Hardcoded project list - not reading from disk
-    [SerializeField] private List<string> mockProjectNames = new List<string>
-    {
-        "City Project 1",
-        "Mountain Terrain",
-        "Desert Landscape",
-        "Island Paradise",
-        "Urban District"
-    };
-    
     private List<GameObject> projectListItems = new List<GameObject>();
+    private TerrainSaveLoadManager saveLoadManager;
 
     private void Start()
     {
-        //set the default directory path
-        if (directoryPathInput != null)
-            directoryPathInput.text = defaultDirectoryPath;
+        // Find SaveLoadManager
+        saveLoadManager = FindFirstObjectByType<TerrainSaveLoadManager>();
+        if (saveLoadManager == null)
+        {
+            // Create one if it doesn't exist
+            GameObject go = new GameObject("TerrainSaveLoadManager");
+            saveLoadManager = go.AddComponent<TerrainSaveLoadManager>();
+        }
 
-        //Button listeners
+        // Set the default directory path to SaveLoadManager's directory
+        if (directoryPathInput != null && saveLoadManager != null)
+        {
+            string defaultPath = Path.Combine(Application.persistentDataPath, "Projects");
+            directoryPathInput.text = defaultPath;
+        }
+
+        // Button listeners
         if (cancelButton != null)
             cancelButton.onClick.AddListener(OnCancelClicked);
 
@@ -48,27 +48,38 @@ public class LoadProjectPopup : MonoBehaviour
     {
         ClearProjectList();
 
-        //Get directory path from input field (not working yet)
-        string directoryPath = directoryPathInput != null ? directoryPathInput.text : defaultDirectoryPath;
-        
-        Debug.Log($"[MOCKUP] scan direct: {directoryPath}");
-        Debug.Log("[MOCKUP] not reading disk using hardcoded list");
-
         if (projectListContainer == null || projectListItemPrefab == null)
         {
-            Debug.Log("Proj list cont/pref not assigned");
+            Debug.LogWarning("Project list container or prefab not assigned");
             return;
         }
 
-        //create project item [MOCKUP]
-        foreach (string projectName in mockProjectNames)
+        if (saveLoadManager == null)
         {
-            CreateProjectListItem(projectName);
+            Debug.LogError("SaveLoadManager not found!");
+            return;
         }
 
+        // Get all project files from SaveLoadManager
+        string[] projectFiles = saveLoadManager.GetAllProjectFiles();
+
+        Debug.Log($"Found {projectFiles.Length} project files");
+
+        if (projectFiles.Length == 0)
+        {
+            Debug.Log("No saved projects found. Create a new project first!");
+            return;
+        }
+
+        // Create UI items for each project
+        foreach (string filePath in projectFiles)
+        {
+            string projectName = saveLoadManager.GetProjectNameFromPath(filePath);
+            CreateProjectListItem(projectName, filePath);
+        }
     }
 
-    private void CreateProjectListItem(string projectName)
+    private void CreateProjectListItem(string projectName, string filePath)
     {
         GameObject listItem = Instantiate(projectListItemPrefab, projectListContainer);
 
@@ -76,29 +87,26 @@ public class LoadProjectPopup : MonoBehaviour
 
         projectListItems.Add(listItem);
 
-        Button itemButton = listItem.GetComponent<Button>(); 
+        Button itemButton = listItem.GetComponent<Button>();
         if (itemButton == null)
             itemButton = listItem.GetComponentInChildren<Button>();
 
         if (itemButton != null)
-            itemButton.onClick.AddListener(() => OnProjectSelected(projectName)); 
+            itemButton.onClick.AddListener(() => OnProjectSelected(projectName, filePath));
 
         TextMeshProUGUI nameText = listItem.GetComponentInChildren<TextMeshProUGUI>();
         if (nameText != null)
             nameText.text = projectName;
     }
-    
-    private void OnProjectSelected(string projectName)
+
+    private void OnProjectSelected(string projectName, string filePath)
     {
-        string directoryPath = directoryPathInput != null ? directoryPathInput.text : defaultDirectoryPath;
+        Debug.Log($"Loading project: {projectName} from {filePath}");
 
+        // Store load data for transfer to main scene
+        ProjectDataTransfer.Instance.SetLoadProjectData(filePath);
 
-        //MOCK
-        Debug.Log($"[MOCKUP] Would load project: {projectName}");
-        Debug.Log($"  From directory: {directoryPath}");
-        Debug.Log("[MOCKUP] No actual file loading - just mockup!");
-
-        //load Main scene
+        // Load main scene
         MainMenuButtons mainMenu = FindFirstObjectByType<MainMenuButtons>();
         if (mainMenu != null)
         {
@@ -112,18 +120,19 @@ public class LoadProjectPopup : MonoBehaviour
 
     private void ClearProjectList()
     {
-        //clear all items in list
-        foreach (GameObject item in projectListItems) 
+        // Clear all items in list
+        foreach (GameObject item in projectListItems)
         {
-            if (item != null) 
+            if (item != null)
                 Destroy(item);
         }
-        projectListItems.Clear(); 
+        projectListItems.Clear();
     }
+
     private void OnCancelClicked()
     {
-        //close popup
-        gameObject.SetActive(false); 
+        // Close popup
+        gameObject.SetActive(false);
     }
 
     private void OnDestroy()
