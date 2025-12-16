@@ -18,8 +18,7 @@ public class EditorLoadProjectPopup : MonoBehaviour
     private void Start()
     {
         // Find managers
-        saveLoadManager = FindFirstObjectByType<TerrainSaveLoadManager>();
-        editorMenuButtons = FindFirstObjectByType<EditorMenuButtons>();
+        FindManagers();
 
         // Button listeners
         if (cancelButton != null)
@@ -30,7 +29,20 @@ public class EditorLoadProjectPopup : MonoBehaviour
 
     private void OnEnable()
     {
+        // Find managers if not already found
+        if (saveLoadManager == null || editorMenuButtons == null)
+            FindManagers();
+
         RefreshProjectList();
+    }
+
+    private void FindManagers()
+    {
+        if (saveLoadManager == null)
+            saveLoadManager = FindFirstObjectByType<TerrainSaveLoadManager>();
+
+        if (editorMenuButtons == null)
+            editorMenuButtons = FindFirstObjectByType<EditorMenuButtons>();
     }
 
     public void RefreshProjectList()
@@ -43,10 +55,16 @@ public class EditorLoadProjectPopup : MonoBehaviour
             return;
         }
 
+        // Ensure we have the manager
         if (saveLoadManager == null)
         {
-            Debug.LogError("SaveLoadManager not found!");
-            return;
+            saveLoadManager = FindFirstObjectByType<TerrainSaveLoadManager>();
+
+            if (saveLoadManager == null)
+            {
+                Debug.LogError("SaveLoadManager not found in scene!");
+                return;
+            }
         }
 
         // Get all project files

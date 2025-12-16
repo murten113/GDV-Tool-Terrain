@@ -19,15 +19,9 @@ public class LoadProjectPopup : MonoBehaviour
     private void Start()
     {
         // Find SaveLoadManager
-        saveLoadManager = FindFirstObjectByType<TerrainSaveLoadManager>();
-        if (saveLoadManager == null)
-        {
-            // Create one if it doesn't exist
-            GameObject go = new GameObject("TerrainSaveLoadManager");
-            saveLoadManager = go.AddComponent<TerrainSaveLoadManager>();
-        }
+        FindSaveLoadManager();
 
-        // Set the default directory path to SaveLoadManager's directory
+        // Set the default directory path
         if (directoryPathInput != null && saveLoadManager != null)
         {
             string defaultPath = Path.Combine(Application.persistentDataPath, "Projects");
@@ -44,6 +38,30 @@ public class LoadProjectPopup : MonoBehaviour
         RefreshProjectList();
     }
 
+    private void OnEnable()
+    {
+        // Find manager if not already found
+        if (saveLoadManager == null)
+            FindSaveLoadManager();
+
+        RefreshProjectList();
+    }
+
+    private void FindSaveLoadManager()
+    {
+        if (saveLoadManager == null)
+        {
+            saveLoadManager = FindFirstObjectByType<TerrainSaveLoadManager>();
+
+            if (saveLoadManager == null)
+            {
+                Debug.Log("Creating TerrainSaveLoadManager in Menu scene");
+                GameObject go = new GameObject("TerrainSaveLoadManager");
+                saveLoadManager = go.AddComponent<TerrainSaveLoadManager>();
+            }
+        }
+    }
+
     public void RefreshProjectList()
     {
         ClearProjectList();
@@ -54,10 +72,16 @@ public class LoadProjectPopup : MonoBehaviour
             return;
         }
 
+        // Ensure we have the manager
         if (saveLoadManager == null)
         {
-            Debug.LogError("SaveLoadManager not found!");
-            return;
+            FindSaveLoadManager();
+
+            if (saveLoadManager == null)
+            {
+                Debug.LogError("SaveLoadManager not found!");
+                return;
+            }
         }
 
         // Get all project files from SaveLoadManager

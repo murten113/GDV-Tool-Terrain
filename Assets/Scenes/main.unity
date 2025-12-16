@@ -5405,15 +5405,6 @@ MonoBehaviour:
   cancelButton: {fileID: 212438740}
   projectListContainer: {fileID: 249936734}
   projectListItemPrefab: {fileID: 2928470983232255448, guid: cda0d51064d5e8d4e999265485af3f04, type: 3}
-  defaultDirectoryPath: C:/Projects/
-  mockProjectNames:
-  - City Project 1
-  - Mountain Terrain
-  - Desert Landscape
-  - Island Paradise
-  - Urban District
-  - baba
-  - metesting
 --- !u!114 &998826490
 MonoBehaviour:
   m_ObjectHideFlags: 0
