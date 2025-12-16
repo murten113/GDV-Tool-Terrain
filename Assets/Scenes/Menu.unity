@@ -2239,7 +2239,7 @@ GameObject:
   - component: {fileID: 926163490}
   - component: {fileID: 926163493}
   - component: {fileID: 926163492}
-  - component: {fileID: 926163491}
+  - component: {fileID: 926163494}
   m_Layer: 5
   m_Name: LoadProjectPopup
   m_TagString: Untagged
@@ -2271,32 +2271,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -100, y: -100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &926163491
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 926163489}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 346a9d1d3d009f847b324b62447b357b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  directoryPathInput: {fileID: 1212335780}
-  refreshButton: {fileID: 1991253950}
-  cancelButton: {fileID: 616487312}
-  projectListContainer: {fileID: 1157180339}
-  projectListItemPrefab: {fileID: 2928470983232255448, guid: cda0d51064d5e8d4e999265485af3f04, type: 3}
-  defaultDirectoryPath: C:/Projects/
-  mockProjectNames:
-  - City Project 1
-  - Mountain Terrain
-  - Desert Landscape
-  - Island Paradise
-  - Urban District
-  - baba
-  - metesting
 --- !u!114 &926163492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2335,6 +2309,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 926163489}
   m_CullTransparentMesh: 1
+--- !u!114 &926163494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 926163489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5667c9b88bb0fa14d8cb8098bf73e897, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cancelButton: {fileID: 616487312}
+  projectListContainer: {fileID: 102545773}
+  projectListItemPrefab: {fileID: 2928470983232255448, guid: cda0d51064d5e8d4e999265485af3f04, type: 3}
 --- !u!1 &1048142637
 GameObject:
   m_ObjectHideFlags: 0
@@ -4255,8 +4244,11 @@ MonoBehaviour:
   savePathInput: {fileID: 1490088465}
   continueButton: {fileID: 402750919}
   cancelButton: {fileID: 579543002}
+  terrainWidthInput: {fileID: 0}
+  terrainHeightInput: {fileID: 0}
   defaultProjectName: New Project
   defaultSavePath: C:/Projects/
+  defaultTerrainSize: 100
 --- !u!1 &1490088463
 GameObject:
   m_ObjectHideFlags: 0
