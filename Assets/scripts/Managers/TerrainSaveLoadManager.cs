@@ -58,7 +58,22 @@ public class TerrainSaveLoadManager : MonoBehaviour
 
         if (string.IsNullOrEmpty(filePath))
         {
-            filePath = GetProjectFilePath;
+            filePath = GetProjectFilePath(project.projectName);
+        }
+
+        try
+        {
+            string json = JsonUtility.ToJson(project, true);
+
+            File.WriteAllText(filePath, json);
+
+            Debug.Log($"Project '{project.projectName}' saved successfully to {filePath}");
+            return true;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Failed to save project '{project.projectName}': {e.Message}");
+            return false;
         }
     }
 }
