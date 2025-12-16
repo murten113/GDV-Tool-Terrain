@@ -31,6 +31,20 @@ public class BrushSettingsPanel : CollapsiblePanel
         collapsedPosition = new Vector2(expandedPosition.x, -panelHeight);
     }
 
+    private void Start()
+    {
+        if (brushManager == null)
+            brushManager = FindFirstObjectByType<BrushManager>();
+
+        if (brushSizeSlider != null)
+        {
+            brushSizeSlider.minValue = minBrushSize;
+            brushSizeSlider.maxValue = maxBrushSize;
+            brushSizeSlider.value = brushManager != null ? brushManager.GetBrushSize() : 5f;
+            brushSizeSlider.onValueChanged.AddListener(OnBrushSizeChanged);
+        }
+    }
+
     public void OnToggleButtonClicked()
     {
         Toggle();
