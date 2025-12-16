@@ -29,8 +29,34 @@ public class TerrainManager : MonoBehaviour
 
     private void Start()
     {
-        // Initialize terrain on start
-        InitializeTerrain();
+        // Check if we're loading from menu with project data
+        ProjectDataTransfer transfer = ProjectDataTransfer.Instance;
+
+        if (transfer != null && transfer.isNewProject)
+        {
+            // Create new project with transferred data
+            CreateNewTerrain(transfer.ProjectName, transfer.terrainWidth, transfer.terrainHeight);
+            transfer.ClearData(); // Clear after use
+        }
+        else if (transfer != null && !transfer.isNewProject && !string.IsNullOrEmpty(transfer.loadFilePath))
+        {
+            // Load existing project
+            TerrainSaveLoadManager saveLoadManager = FindFirstObjectByType<TerrainSaveLoadManager>();
+            if (saveLoadManager != null)
+            {
+                TerrainProject loadedProject = saveLoadManager.LoadProject(transfer.loadFilePath);
+                if (loadedProject != null)
+                {
+                    LoadTerrain(loadedProject);
+                }
+            }
+            transfer.ClearData(); // Clear after use
+        }
+        else
+        {
+            // Default: Initialize with flat terrain
+            InitializeTerrain();
+        }
     }
 
     // Initialize terrain with flat terrain
