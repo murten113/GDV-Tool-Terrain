@@ -13,7 +13,6 @@ public class BrushManager : MonoBehaviour
 
     private BaseBrush currentBrush;
     private TerrainRaycaster raycaster;
-    private bool isPainting = false;
 
     public enum BrushType
     {
@@ -27,28 +26,31 @@ public class BrushManager : MonoBehaviour
         raycaster = FindFirstObjectByType<TerrainRaycaster>();
 
         if (raycaster == null)
-        {
-            Debug.LogError("BrushManager: TerrainRaycaster not found");
-        }
+            Debug.LogError("BrushManager: TerrainRaycaster not found!");
 
+        // Set default brush settings
         UpdateBrushSettings();
     }
 
     private void Update()
     {
+        // Check if we should paint
         if (Input.GetMouseButton(0) && currentBrush != null)
         {
-            paint();
+            Paint();
         }
 
+        // Reset flatten height when mouse is released
         if (Input.GetMouseButtonUp(0) && flattenBrush != null)
         {
             flattenBrush.ResetFlattenHeight();
         }
     }
 
-    public void SetActiveBrush()
+    // Set the active brush
+    public void SetActiveBrush(BrushType brushType)
     {
+        // Reset flatten brush if switching away
         if (flattenBrush != null && currentBrush != null && currentBrush.GetType() == typeof(FlattenBrush))
         {
             flattenBrush.ResetFlattenHeight();
@@ -67,10 +69,11 @@ public class BrushManager : MonoBehaviour
                 break;
         }
 
-        Debug.Log("Active Brush set to: {brushType} ");
+        Debug.Log($"Active brush: {brushType}");
     }
 
-    private void paint()
+    // Paint at mouse position
+    private void Paint()
     {
         if (raycaster == null || currentBrush == null)
             return;
@@ -84,6 +87,7 @@ public class BrushManager : MonoBehaviour
         }
     }
 
+    // Update brush settings (size and strength)
     public void SetBrushSize(float size)
     {
         brushSize = size;
@@ -96,7 +100,7 @@ public class BrushManager : MonoBehaviour
         UpdateBrushSettings();
     }
 
-    public void UpdateBrushSettings()
+    private void UpdateBrushSettings()
     {
         if (raiseBrush != null)
         {
@@ -116,6 +120,7 @@ public class BrushManager : MonoBehaviour
             flattenBrush.brushStrength = brushStrength;
         }
     }
+
     public float GetBrushSize() => brushSize;
     public float GetBrushStrength() => brushStrength;
 }
