@@ -21,7 +21,7 @@ public abstract class BaseBrush : MonoBehaviour
 
     public abstract void ApplyBrush(Vector3 worldPosition);
 
-    protected void ModifyHeightmap(Vector3 centerWorldPos, float strength, System.Func<float, float, float> heightmodif)
+    protected void ModifyHeightmap(Vector3 centerWorldPos, float strength, System.Func<float, float, float> heightModifier)
     {
         if (terrainManager == null || terrainManager.CurrentTerrainData == null)
             return;
@@ -34,5 +34,27 @@ public abstract class BaseBrush : MonoBehaviour
 
         // Calculate brush radius in heightmap units
         int brushRadius = Mathf.CeilToInt(brushSize / data.horizontalScale);
+
+        bool hasChanges = false;
+        for (int y = -brushRadius; y <= brushRadius; y++)
+        {
+            for (int x = -brushRadius; x <= brushRadius; x++)
+            {
+                // Calculate heightmap coordinates
+                int heightmapX = centerX + x;
+                int heightmapY = centerY + y;
+
+                // Check bounds
+                float dist = Mathf.Sqrt(x * x + y * y) * data.horizontalScale;
+                if (dist > brushSize)
+                    continue;
+
+                float distance = Mathf.Sqrt(x * x + y * y);
+                if (distance > brushRadius)
+                    continue;
+
+                float normalizedDistance = distance / brushRadius;
+            }
+        }
     }
 }
