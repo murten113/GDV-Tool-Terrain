@@ -54,6 +54,18 @@ public abstract class BaseBrush : MonoBehaviour
                     continue;
 
                 float normalizedDistance = distance / brushRadius;
+                float falloff = 1f - normalizedDistance; // Linear falloff
+                falloff = Mathf.Clamp01(falloff);
+
+                // Get current height
+                float currentHeight = data.GetHeight(heightmapX, heightmapY);
+
+                // Apply modifier
+                float newHeight = heightModifier(currentHeight, falloff * strength * brushStrength);
+
+                // Set new height
+                data.SetHeight(heightmapX, heightmapY, newHeight);
+                hasChanges = true;
             }
         }
     }
