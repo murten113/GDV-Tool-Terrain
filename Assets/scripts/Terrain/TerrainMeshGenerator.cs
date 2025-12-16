@@ -109,6 +109,8 @@ public class TerrainMeshGenerator : MonoBehaviour
         Debug.Log($"Generated terrain mesh: {width}x{height} vertices");
     }
 
+
+    // Update the existing mesh with new height data
     public void Updatemesh(TerrainData terrainData)
     {
         if (terrainMesh == null)
@@ -122,6 +124,7 @@ public class TerrainMeshGenerator : MonoBehaviour
 
         Vector3[] vertices = terrainMesh.vertices;
 
+        // Update vertex heights based on the heightmap
         for (int y = 0; y <= height; y++)
         {
             for (int x = 0; x <= width; x++)
@@ -139,6 +142,7 @@ public class TerrainMeshGenerator : MonoBehaviour
             }
         }
 
+        // Apply updated vertices to the mesh
         terrainMesh.vertices = vertices;
         terrainMesh.RecalculateNormals();
         terrainMesh.RecalculateBounds();
