@@ -59,6 +59,8 @@ public class TerrainMeshGenerator : MonoBehaviour
             }
         }
 
+        // Triangles: 2 triangles per quad = 6 indices per quad
+        // Total quads = width * height
         int[] triangles = new int[width * height * 6];
         int triIndex = 0;
 
@@ -66,7 +68,20 @@ public class TerrainMeshGenerator : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
+                int bottomLeft = x + y * (width + 1);
+                int bottomRight = (x + 1) + y * (width + 1);
+                int topLeft = x + (y + 1) * (width + 1);
+                int topRight = (x + 1) + (y + 1) * (width + 1);
 
+                // First triangle (bottom-left to top-left to top-right)
+                triangles[triIndex++] = bottomLeft;
+                triangles[triIndex++] = topLeft;
+                triangles[triIndex++] = topRight;
+
+                // Second triangle (bottom-left to top-right to bottom-right)
+                triangles[triIndex++] = bottomLeft;
+                triangles[triIndex++] = topRight;
+                triangles[triIndex++] = bottomRight;
             }
         }
 
