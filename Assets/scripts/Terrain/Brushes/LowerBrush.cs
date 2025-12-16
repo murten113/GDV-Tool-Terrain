@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class RaiseBrush : BaseBrush
+public class LowerBrush : BaseBrush
 {
     public override void ApplyBrush(Vector3 worldPosition)
     {
         ModifyHeightmap(worldPosition, brushStrength, (currentHeight, strength) =>
         {
-            // Raise: add to current height
-            return currentHeight + strength * Time.deltaTime;
+            // Lower: subtract from current height
+            return currentHeight - strength * Time.deltaTime;
         });
     }
 }
