@@ -106,6 +106,42 @@ public class TerrainMeshGenerator : MonoBehaviour
             meshRenderer.sharedMaterial = defaultMaterial;
         }
 
+        Debug.Log($"Generated terrain mesh: {width}x{height} vertices");
+    }
+
+    public void Updatemesh(TerrainData terrainData)
+    {
+        if (terrainMesh == null)
+        {
+            GenerateMesh(terrainData);
+            return;
+        }
+
+        int width = terrainData.width;
+        int height = terrainData.height;
+
+        Vector3[] vertices = terrainMesh.vertices;
+
+        for (int y = 0; y <= height; y++)
+        {
+            for (int x = 0; x <= width; x++)
+            {
+                int index = x + y * (width + 1);
+
+                if (index >= vertices.Length)
+                    continue;
+
+                int heightmapX = Mathf.Min(x, width - 1);
+                int heightmapY = Mathf.Min(y, height - 1);
+                float heightValue = terrainData.GetHeight(heightmapX, heightmapY) * terrainData.verticalScale;
+
+                vertices[index].y = heightValue;
+            }
+        }
+
+        terrainMesh.vertices = vertices;
+        terrainMesh.RecalculateNormals();
+        terrainMesh.RecalculateBounds();
     }
 
 }
