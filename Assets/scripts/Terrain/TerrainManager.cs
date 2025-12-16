@@ -26,4 +26,35 @@ public class TerrainManager : MonoBehaviour
         if (meshGenerator == null)
             meshGenerator = gameObject.AddComponent<TerrainMeshGenerator>();
     }
+
+    private void Start()
+    {
+        // Initialize terrain on start
+        initializeTerrain();
+    }
+
+    public void initializeTerrain()
+    {
+        currentTerrainData = new TerrainData(terrainWidth, terrainHeight);
+        currentTerrainData.horizontalScale = horizontalScale;
+        currentTerrainData.verticalScale = verticalScale;
+
+        currentProject = new TerrainProject("Default Project", currentTerrainData);
+
+        GenerateTerrainMesh();
+    }
+
+
+
+
+
+
+    // Generate the mesh from current terrain data
+    private void GenerateTerrainMesh()
+    {
+        if (meshGenerator != null && currentTerrainData != null)
+        {
+            meshGenerator.GenerateMesh(currentTerrainData);
+        }
+    }
 }
