@@ -31,6 +31,44 @@ public class TerrainMeshGenerator : MonoBehaviour
         }
 
         terrainMesh = new Mesh();
+        terrainMesh.name = "Terrain Mesh";
+
+        int width = terrainData.width;
+        int height = terrainData.height;
+
+        // Create vertices and UVs
+        Vector3[] vertices = new Vector3[(width + 1) * (height + 1)];
+        Vector2[] uvs = new Vector2[vertices.Length];
+
+        for (int y = 0; y <= height; y++)
+        {
+            for (int x = 0; x <= width; x++)
+            {
+                int index = x + y * (width + 1);
+
+
+                // Get height value from heightmap 
+                int heightmapX = Mathf.Clamp(x, 0, width - 1);
+                int heightmapY = Mathf.Clamp(y, 0, height - 1);
+                float heightValue = terrainData.GetHeight(heightmapX, heightmapY) * terrainData.verticalScale;
+
+                vertices[index] = new Vector3(x * terrainData.horizontalScale, heightValue, y * terrainData.horizontalScale);
+
+                // UVs coordinates
+                uvs[index] = new Vector2((float)x / width, (float)y / height);
+            }
+        }
+
+        int[] triangles = new int[width * height * 6];
+        int triIndex = 0;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+
+            }
+        }
 
     }
 
