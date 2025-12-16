@@ -4,54 +4,47 @@ public class TerrainCameraController : MonoBehaviour
 {
     [Header("Camera Settings")]
     [SerializeField] private float rotationSpeed = 100f;
-    [SerializeField] private float panSpeed = 0.5f;
+    [SerializeField] private float panSpeed = 10f;
     [SerializeField] private float zoomSpeed = 10f;
     [SerializeField] private float minZoom = 5f;
     [SerializeField] private float maxZoom = 50f;
 
-    [Header("Target")]
-    [SerializeField] private Transform target; // Center point to orbit around
+    [Header("Pan Limits")]
+    [SerializeField] private bool usePanLimits = false;
+    [SerializeField] private float panLimitX = 100f;
+    [SerializeField] private float panLimitZ = 100f;
 
     private Vector3 lastMousePosition;
-    private float currentZoom = 20f;
+    private float currentZoom = 30f;
     private TerrainManager terrainManager;
-    private Vector3 terrainCenter; // Store terrain center position
 
     private void Start()
     {
-        // Find terrain manager to get terrain center
+        // Find terrain manager
         terrainManager = FindFirstObjectByType<TerrainManager>();
 
-        // Calculate terrain center based on terrain data
+        // Calculate terrain center
+        Vector3 terrainCenter = Vector3.zero;
         if (terrainManager != null && terrainManager.CurrentTerrainData != null)
         {
             TerrainData data = terrainManager.CurrentTerrainData;
-            // Calculate center position
             float centerX = (data.width * data.horizontalScale) / 2f;
             float centerZ = (data.height * data.horizontalScale) / 2f;
             terrainCenter = new Vector3(centerX, 0, centerZ);
         }
-        else
-        {
-            terrainCenter = Vector3.zero;
-        }
 
-        // Set target to terrain center if not assigned
-        if (target == null)
-        {
-            GameObject targetObj = new GameObject("CameraTarget");
-            target = targetObj.transform;
-        }
-
-        // Set target position to terrain center
-        target.position = terrainCenter;
-
-        // Initialize camera position
+        // Initialize camera position (looking down at terrain at angle)
         currentZoom = 30f;
-        transform.position = terrainCenter + new Vector3(0, 20, -20);
-        transform.LookAt(terrainCenter);
-        currentZoom = Vector3.Distance(transform.position, terrainCenter);
-        currentZoom = Mathf.Clamp(currentZoom, minZoom, maxZoom);
+        transform.position = terrainCenter + new Vector3(0, currentZoom, -currentZoom * 0.5f);
+        transform.rotation = Quaternion.Euler(45f, 0f, 0f); // 45 degree angle looking down
+
+        // Update pan limits based on terrain size
+        if (terrainManager != null && terrainManager.CurrentTerrainData != null)
+        {
+            TerrainData data = terrainManager.CurrentTerrainData;
+            panLimitX = data.width * data.horizontalScale;
+            panLimitZ = data.height * data.horizontalScale;
+        }
     }
 
     private void Update()
@@ -63,59 +56,49 @@ public class TerrainCameraController : MonoBehaviour
 
     private void HandleRotation()
     {
-        // Right mouse button held = rotate
+        // Right mouse button held = rotate around Y axis only
         if (Input.GetMouseButton(1))
         {
-            Vector3 delta = Input.mousePosition - lastMousePosition;
+            float deltaX = Input.mousePosition.x - lastMousePosition.x;
+            float rotationAmount = deltaX * rotationSpeed * Time.deltaTime;
 
-            float horizontal = delta.x * rotationSpeed * Time.deltaTime;
-            float vertical = -delta.y * rotationSpeed * Time.deltaTime;
-
-            // Rotate around terrain center
-            transform.RotateAround(terrainCenter, Vector3.up, horizontal);
-            transform.RotateAround(terrainCenter, transform.right, vertical);
-
-            // Keep camera looking at terrain center
-            transform.LookAt(terrainCenter);
-
-            // Update zoom distance
-            currentZoom = Vector3.Distance(transform.position, terrainCenter);
+            // Rotate only around Y axis (horizontal rotation)
+            transform.Rotate(0, rotationAmount, 0, Space.World);
         }
     }
 
     private void HandlePan()
     {
-        // Middle mouse button or Shift+Left mouse = pan
+        // Middle mouse button or Shift+Left mouse = pan (RTS style - horizontal only)
         bool isPanning = Input.GetMouseButton(2) || (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftShift));
 
         if (isPanning)
         {
             Vector3 delta = lastMousePosition - Input.mousePosition; // Reversed for natural panning
 
-            // Calculate movement in camera's right and up directions (on XZ plane)
+            // Get camera's forward and right directions (projected onto XZ plane - horizontal only)
+            Vector3 forward = transform.forward;
+            forward.y = 0; // Remove vertical component
+            forward.Normalize();
+
             Vector3 right = transform.right;
-            right.y = 0; // Keep panning horizontal
+            right.y = 0; // Remove vertical component
             right.Normalize();
 
-            Vector3 up = transform.up;
-            up.y = 0; // Keep panning horizontal
-            up.Normalize();
+            // Calculate pan movement (only horizontal)
+            Vector3 panMovement = (right * delta.x + forward * delta.y) * panSpeed * Time.deltaTime;
 
-            Vector3 movement = (right * delta.x + up * delta.y) * panSpeed;
+            // Apply panning
+            Vector3 newPosition = transform.position + panMovement;
 
-            // Move ONLY the terrain center (not the target GameObject)
-            terrainCenter += movement;
+            // Apply limits if enabled
+            if (usePanLimits)
+            {
+                newPosition.x = Mathf.Clamp(newPosition.x, -panLimitX, panLimitX);
+                newPosition.z = Mathf.Clamp(newPosition.z, -panLimitZ, panLimitZ);
+            }
 
-            // Update camera position to maintain distance and look at new center
-            Vector3 direction = (transform.position - terrainCenter).normalized;
-            if (direction == Vector3.zero)
-                direction = -transform.forward;
-            transform.position = terrainCenter + direction * currentZoom;
-            transform.LookAt(terrainCenter);
-
-            // Also update target GameObject position for reference
-            if (target != null)
-                target.position = terrainCenter;
+            transform.position = newPosition;
         }
     }
 
@@ -124,16 +107,19 @@ public class TerrainCameraController : MonoBehaviour
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (Mathf.Abs(scroll) > 0.01f)
         {
-            currentZoom -= scroll * zoomSpeed;
-            currentZoom = Mathf.Clamp(currentZoom, minZoom, maxZoom);
+            // Zoom by moving camera forward/backward along its forward direction
+            Vector3 zoomDirection = transform.forward;
+            float zoomAmount = scroll * zoomSpeed;
 
-            // Move camera closer/further from terrain center
-            Vector3 direction = (transform.position - terrainCenter).normalized;
-            if (direction == Vector3.zero)
-                direction = -transform.forward;
+            Vector3 newPosition = transform.position + zoomDirection * zoomAmount;
 
-            transform.position = terrainCenter + direction * currentZoom;
-            transform.LookAt(terrainCenter);
+            // Clamp zoom distance
+            float distanceFromOrigin = newPosition.magnitude;
+            if (distanceFromOrigin >= minZoom && distanceFromOrigin <= maxZoom)
+            {
+                transform.position = newPosition;
+                currentZoom = distanceFromOrigin;
+            }
         }
     }
 
