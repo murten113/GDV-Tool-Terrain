@@ -4,7 +4,7 @@ public class TerrainCameraController : MonoBehaviour
 {
     [Header("Camera Settings")]
     [SerializeField] private float rotationSpeed = 100f;
-    [SerializeField] private float panSpeed = 10f;
+    [SerializeField] private float panSpeed = 0.5f; // Increased for better panning
     [SerializeField] private float zoomSpeed = 10f;
     [SerializeField] private float minZoom = 5f;
     [SerializeField] private float maxZoom = 50f;
@@ -14,9 +14,13 @@ public class TerrainCameraController : MonoBehaviour
 
     private Vector3 lastMousePosition;
     private float currentZoom = 20f;
+    private TerrainManager terrainManager;
 
     private void Start()
     {
+        // Find terrain manager to get terrain center
+        terrainManager = FindFirstObjectByType<TerrainManager>();
+
         // Set target to terrain center if not assigned
         if (target == null)
         {
@@ -33,9 +37,22 @@ public class TerrainCameraController : MonoBehaviour
             }
         }
 
+        // Calculate terrain center based on terrain data
+        if (terrainManager != null && terrainManager.CurrentTerrainData != null)
+        {
+            TerrainData data = terrainManager.CurrentTerrainData;
+            // Calculate center position
+            float centerX = (data.width * data.horizontalScale) / 2f;
+            float centerZ = (data.height * data.horizontalScale) / 2f;
+            target.position = new Vector3(centerX, 0, centerZ);
+        }
+
         // Initialize camera position
         if (target != null)
         {
+            // Position camera at a good angle
+            currentZoom = 30f;
+            transform.position = target.position + new Vector3(0, 20, -20);
             transform.LookAt(target);
             currentZoom = Vector3.Distance(transform.position, target.position);
             currentZoom = Mathf.Clamp(currentZoom, minZoom, maxZoom);
@@ -63,6 +80,9 @@ public class TerrainCameraController : MonoBehaviour
             {
                 transform.RotateAround(target.position, Vector3.up, horizontal);
                 transform.RotateAround(target.position, transform.right, vertical);
+
+                // Keep camera looking at target
+                Vector3 direction = (transform.position - target.position).normalized;
                 transform.LookAt(target);
             }
         }
@@ -73,20 +93,26 @@ public class TerrainCameraController : MonoBehaviour
         // Middle mouse button or Shift+Left mouse = pan
         bool isPanning = Input.GetMouseButton(2) || (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftShift));
 
-        if (isPanning && target != null)
+        if (isPanning)
         {
-            Vector3 delta = Input.mousePosition - lastMousePosition;
+            Vector3 delta = lastMousePosition - Input.mousePosition; // Reversed for natural panning
 
-            // Calculate movement in camera space
-            Vector3 right = transform.right * delta.x * panSpeed * Time.deltaTime * 0.1f;
-            Vector3 forward = transform.forward;
-            forward.y = 0; // Keep panning horizontal
-            forward.Normalize();
-            Vector3 upMovement = transform.up * delta.y * panSpeed * Time.deltaTime * 0.1f;
+            // Calculate movement in camera's right and up directions
+            Vector3 right = transform.right * delta.x * panSpeed;
+            Vector3 up = transform.up * delta.y * panSpeed;
 
-            Vector3 movement = right + upMovement;
-            transform.position -= movement;
-            target.position -= movement;
+            Vector3 movement = right + up;
+
+            // Move both camera and target
+            if (target != null)
+            {
+                transform.position += movement;
+                target.position += movement;
+            }
+            else
+            {
+                transform.position += movement;
+            }
         }
     }
 
@@ -98,7 +124,7 @@ public class TerrainCameraController : MonoBehaviour
             currentZoom -= scroll * zoomSpeed;
             currentZoom = Mathf.Clamp(currentZoom, minZoom, maxZoom);
 
-            // Move camera closer/further from target
+            // Move camera closer/further from target while maintaining direction
             Vector3 direction = (transform.position - target.position).normalized;
             if (direction == Vector3.zero)
                 direction = -transform.forward;
