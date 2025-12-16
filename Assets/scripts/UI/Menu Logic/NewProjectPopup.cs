@@ -10,9 +10,14 @@ public class NewProjectPopup : MonoBehaviour
     [SerializeField] private Button continueButton;
     [SerializeField] private Button cancelButton;
 
-    [Header("Mockup Settings")]
+    [Header("Terrain Size Settings")]
+    [SerializeField] private TMP_InputField terrainWidthInput;
+    [SerializeField] private TMP_InputField terrainHeightInput;
+
+    [Header("Default Settings")]
     [SerializeField] private string defaultProjectName = "New Project";
     [SerializeField] private string defaultSavePath = "C:/Projects/";
+    [SerializeField] private int defaultTerrainSize = 100;
 
     private void Start()
     {
@@ -22,6 +27,12 @@ public class NewProjectPopup : MonoBehaviour
 
         if (savePathInput != null)
             savePathInput.text = defaultSavePath;
+
+        if (terrainWidthInput != null)
+            terrainWidthInput.text = defaultTerrainSize.ToString();
+
+        if (terrainHeightInput != null)
+            terrainHeightInput.text = defaultTerrainSize.ToString();
 
         // Wire up buttons
         if (continueButton != null)
@@ -44,22 +55,30 @@ public class NewProjectPopup : MonoBehaviour
     private void OnContinueClicked()
     {
         string projectName = projectNameInput != null ? projectNameInput.text : defaultProjectName;
-        string savePath = savePathInput != null ? savePathInput.text : defaultSavePath;
 
-        // MOCKUP: Just validate inputs (don't actually create files)
+        // Validate inputs
         if (string.IsNullOrWhiteSpace(projectName))
         {
-            Debug.LogWarning("[MOCKUP] Project name cannot be empty!");
+            Debug.LogWarning("Project name cannot be empty!");
             return;
         }
 
-        // MOCKUP: Just log what would happen
-        Debug.Log($"[MOCKUP] Would create new project:");
-        Debug.Log($"  Project Name: {projectName}");
-        Debug.Log($"  Save Path: {savePath}");
-        Debug.Log("[MOCKUP] No actual file creation - just mockup!");
+        // Parse terrain size
+        int terrainWidth = defaultTerrainSize;
+        int terrainHeight = defaultTerrainSize;
 
-        // Load main scene (this is the only real action)
+        if (terrainWidthInput != null && int.TryParse(terrainWidthInput.text, out int width))
+            terrainWidth = Mathf.Clamp(width, 10, 500);
+
+        if (terrainHeightInput != null && int.TryParse(terrainHeightInput.text, out int height))
+            terrainHeight = Mathf.Clamp(height, 10, 500);
+
+        // Store project data for transfer to main scene
+        ProjectDataTransfer.Instance.SetNewProjectData(projectName, terrainWidth, terrainHeight);
+
+        Debug.Log($"Creating new project: {projectName} ({terrainWidth}x{terrainHeight})");
+
+        // Load main scene
         MainMenuButtons mainMenu = FindFirstObjectByType<MainMenuButtons>();
         if (mainMenu != null)
         {
@@ -82,8 +101,14 @@ public class NewProjectPopup : MonoBehaviour
         // Reset form when popup opens
         if (projectNameInput != null)
             projectNameInput.text = defaultProjectName;
-            
+
         if (savePathInput != null)
             savePathInput.text = defaultSavePath;
+
+        if (terrainWidthInput != null)
+            terrainWidthInput.text = defaultTerrainSize.ToString();
+
+        if (terrainHeightInput != null)
+            terrainHeightInput.text = defaultTerrainSize.ToString();
     }
 }
