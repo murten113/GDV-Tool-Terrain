@@ -97,4 +97,14 @@ public class TerrainManager : MonoBehaviour
             meshGenerator.GenerateMesh(currentTerrainData);
         }
     }
+
+    public float GetHeightAtWorldPosition(float worldX, float worldZ)
+    {
+        if (currentTerrainData != null)
+        {
+            return currentTerrainData.GetHeightAtWorldPosition(worldX, worldZ);
+        }
+
+        return 0f;
+    }
 }
