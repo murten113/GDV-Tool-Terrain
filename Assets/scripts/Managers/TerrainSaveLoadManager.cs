@@ -76,4 +76,51 @@ public class TerrainSaveLoadManager : MonoBehaviour
             return false;
         }
     }
+
+    // Load a TerrainProject from a file
+    public TerrainProject LoadProject(string filePath)
+    {
+        if (!File.Exists(filePath))
+        {
+            Debug.LogError($"Cannot load project: File does not exist at {filePath}");
+            return null;
+        }
+        try
+        {
+            string json = File.ReadAllText(filePath);
+
+            TerrainProject project = JsonUtility.FromJson<TerrainProject>(json);
+            if (project.terrainData != null)
+            {
+                if (project.terrainData.heightMap == null || project.terrainData.heightMap.Length != project.terrainData.width * project.terrainData.height)
+                {
+                    project.terrainData.InitializeFlat();
+                }
+            }
+
+            Debug.Log($"Project '{project.projectName}' loaded successfully from {filePath}");
+            return project;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Failed to load project from '{filePath}': {e.Message}");
+            return null;
+        }
+    }
+
+    public string[] GetAllProjectFiles()
+    {
+        string saveDir = GetSaveDirectory();
+        if (!Directory.Exists(saveDir))
+        {
+            return new string[0];
+        }
+        return Directory.GetFiles(saveDir, "*.terrain");
+    }
+
+    public string GetProjectNameFromPath(string filePath)
+    {
+        string fileName = Path.GetFileNameWithoutExtension(filePath);
+        return fileName;
+    }
 }
