@@ -9637,11 +9637,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 100
-  panSpeed: 10
-  zoomSpeed: 500
-  minZoom: 5
-  maxZoom: 50
-  target: {fileID: 0}
+  panSpeed: 30
+  zoomSpeed: 50
+  minZoom: 10
+  maxZoom: 200
+  usePanLimits: 0
+  panLimitX: 100
+  panLimitZ: 100
 --- !u!114 &2070762815
 MonoBehaviour:
   m_ObjectHideFlags: 0
