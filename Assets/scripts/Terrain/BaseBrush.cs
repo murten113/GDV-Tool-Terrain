@@ -68,5 +68,11 @@ public abstract class BaseBrush : MonoBehaviour
                 hasChanges = true;
             }
         }
+
+        // Update Mesh if there were changes
+        if (hasChanges)
+        {
+            terrainManager.UpdateMesh();
+        }
     }
 }
