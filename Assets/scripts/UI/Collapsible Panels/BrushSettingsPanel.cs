@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 
 public class BrushSettingsPanel : CollapsiblePanel
@@ -33,9 +34,11 @@ public class BrushSettingsPanel : CollapsiblePanel
 
     private void Start()
     {
+        // Initialize UI elements
         if (brushManager == null)
             brushManager = FindFirstObjectByType<BrushManager>();
 
+        // Initialize sliders
         if (brushSizeSlider != null)
         {
             brushSizeSlider.minValue = minBrushSize;
@@ -43,7 +46,50 @@ public class BrushSettingsPanel : CollapsiblePanel
             brushSizeSlider.value = brushManager != null ? brushManager.GetBrushSize() : 5f;
             brushSizeSlider.onValueChanged.AddListener(OnBrushSizeChanged);
         }
+
+        if (brushStrengthSlider != null)
+        {
+            brushStrengthSlider.minValue = minBrushStrength;
+            brushStrengthSlider.maxValue = maxBrushStrength;
+            brushStrengthSlider.value = brushManager != null ? brushManager.GetBrushStrength() : 1f;
+            brushStrengthSlider.onValueChanged.AddListener(OnBrushStrengthChanged);
+        }
+
+        // Update text labels
+        UpdateTextlabels();
     }
+
+    private void OnBrushSizeChanged(float value)
+    {
+        if (brushManager != null)
+        {
+            brushManager.SetBrushSize(value);
+        }
+        UpdateTextlabels();
+    }
+
+    private void OnBrushStrengthChanged(float value)
+    {
+        if (brushManager != null)
+        {
+            brushManager.SetBrushStrength(value);
+        }
+        UpdateTextlabels();
+    }
+
+    private void UpdateTextlabels()
+    {
+        if(brushSieText != null && brushSizeSlider != null)
+        {
+            brushSieText.text = $"Brush size: {brushSizeSlider.value:F1}";
+        }
+
+        if (brushStrengthText != null && brushStrengthSlider != null)
+        {
+            brushStrengthText.text = $"Brush strength: {brushStrengthSlider.value:F1}";
+        }
+    }
+
 
     public void OnToggleButtonClicked()
     {
