@@ -66,14 +66,11 @@ public class EditorMenuButtons : MonoBehaviour
             return;
         }
 
-        // Use default save path for now
-        string defaultPath = Application.dataPath + "/../SavedProjects/current_project.json";
-
-        // FIXED: project first, then filePath
-        bool success = saveLoadManager.SaveProject(terrainManager.CurrentProject, defaultPath);
+        // Pass null to let SaveLoadManager use its default directory
+        bool success = saveLoadManager.SaveProject(terrainManager.CurrentProject, null);
 
         if (success)
-            Debug.Log($"Project saved to: {defaultPath}");
+            Debug.Log($"Project saved successfully");
         else
             Debug.LogError("Failed to save project!");
     }
