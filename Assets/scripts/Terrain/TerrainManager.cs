@@ -44,6 +44,40 @@ public class TerrainManager : MonoBehaviour
         GenerateTerrainMesh();
     }
 
+    public void LoadTerrain(TerrainProject project)
+    {
+        if (project == null || project.terrainData == null)
+        {
+            Debug.LogError("cant load null project");
+            return;
+        }
+
+        currentProject = project;
+        currentTerrainData = project.terrainData;
+
+        // Update terrain settings
+        terrainWidth = currentTerrainData.width;
+        terrainHeight = currentTerrainData.height;
+        horizontalScale = currentTerrainData.horizontalScale;
+        verticalScale = currentTerrainData.verticalScale;
+
+        GenerateTerrainMesh();
+    }
+
+    public void CreateNewTerrain(string projectName, int width, int height)
+    {
+        terrainWidth = width;
+        terrainHeight = height;
+
+        currentTerrainData = new TerrainData(width, height);
+        currentTerrainData.horizontalScale = horizontalScale;
+        currentTerrainData.verticalScale = verticalScale;
+
+        currentProject = new TerrainProject(projectName, currentTerrainData);
+
+        GenerateTerrainMesh();
+    }
+
 
 
 
