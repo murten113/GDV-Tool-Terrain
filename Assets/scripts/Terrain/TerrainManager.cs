@@ -30,19 +30,23 @@ public class TerrainManager : MonoBehaviour
     private void Start()
     {
         // Initialize terrain on start
-        initializeTerrain();
+        InitializeTerrain();
     }
 
-    public void initializeTerrain()
+    // Initialize terrain with flat terrain
+    public void InitializeTerrain()
     {
-        currentTerrainData = new TerrainData(terrainWidth, terrainHeight);
+        currentTerrainData = new TerrainData();
+        currentTerrainData.Initialize(terrainWidth, terrainHeight);
         currentTerrainData.horizontalScale = horizontalScale;
         currentTerrainData.verticalScale = verticalScale;
 
-        currentProject = new TerrainProject("Default Project", currentTerrainData);
+        currentProject = new TerrainProject();
+        currentProject.Initialize("Default Project", currentTerrainData);
 
         GenerateTerrainMesh();
     }
+
 
     public void LoadTerrain(TerrainProject project)
     {
@@ -65,17 +69,19 @@ public class TerrainManager : MonoBehaviour
     }
 
 
-    // Create a new terrain project
+    // Create new terrain project
     public void CreateNewTerrain(string projectName, int width, int height)
     {
         terrainWidth = width;
         terrainHeight = height;
 
-        currentTerrainData = new TerrainData(width, height);
+        currentTerrainData = new TerrainData();
+        currentTerrainData.Initialize(width, height);
         currentTerrainData.horizontalScale = horizontalScale;
         currentTerrainData.verticalScale = verticalScale;
 
-        currentProject = new TerrainProject(projectName, currentTerrainData);
+        currentProject = new TerrainProject();
+        currentProject.Initialize(projectName, currentTerrainData);
 
         GenerateTerrainMesh();
     }

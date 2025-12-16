@@ -1,23 +1,22 @@
 using System;
 using UnityEngine;
 
-
 [Serializable]
-public class TerrainData : MonoBehaviour
+public class TerrainData
 {
     [Header("Dimensions")]
     public int width = 100;
     public int height = 100;
 
     [Header("Scale")]
-    public float horizontalScale = 1f; // Distance between points in the x-axis
-    public float verticalScale = 10f; //heightmap multiplier
+    public float horizontalScale = 1f;  // Distance between vertices
+    public float verticalScale = 10f;    // Height multiplier
 
-    [Header("HeightMmap")]
-    public float[] heightMap; //Flattened array: heightmap[x + y * witdth]
+    [Header("Heightmap")]
+    public float[] heightMap;  // Flattened array: heightMap[x + y * width]
 
-
-    public TerrainData(int w = 100, int h = 100)
+    // No constructor - use Initialize method instead
+    public void Initialize(int w = 100, int h = 100)
     {
         width = w;
         height = h;
@@ -25,12 +24,11 @@ public class TerrainData : MonoBehaviour
         verticalScale = 10f;
         heightMap = new float[width * height];
 
-        //initialize flat terrain
+        // Initialize with flat terrain (all zeros)
         InitializeFlat();
     }
 
-
-    // Initializes the heightmap to a flat terrain (all zeros)
+    // Initialize heightmap with flat terrain (all zeros)
     public void InitializeFlat()
     {
         if (heightMap == null || heightMap.Length != width * height)
@@ -38,31 +36,36 @@ public class TerrainData : MonoBehaviour
             heightMap = new float[width * height];
         }
 
-
-        //alredy zeroed by default, but just to be sure
+        // Already zeros, but explicit for clarity
         for (int i = 0; i < heightMap.Length; i++)
         {
             heightMap[i] = 0f;
         }
     }
 
-
-    // Gets the height at the specified grid coordinates
+    // Get height at specific x, y coordinates
     public float GetHeight(int x, int y)
     {
         if (x < 0 || x >= width || y < 0 || y >= height)
             return 0f;
 
-
         return heightMap[x + y * width];
     }
 
+    // Set height at specific x, y coordinates
+    public void SetHeight(int x, int y, float value)
+    {
+        if (x < 0 || x >= width || y < 0 || y >= height)
+            return;
 
-    // Sets the height at the specified grid coordinates
+        heightMap[x + y * width] = value;
+    }
+
+    // Get height at world position (converts world X/Z to heightmap coordinates)
     public float GetHeightAtWorldPosition(float worldX, float worldZ)
     {
-        int x = Mathf.RoundToInt(worldX / horizontalScale);
-        int y = Mathf.RoundToInt(worldZ / horizontalScale);
+        int x = Mathf.FloorToInt(worldX / horizontalScale);
+        int y = Mathf.FloorToInt(worldZ / horizontalScale);
         return GetHeight(x, y) * verticalScale;
     }
 

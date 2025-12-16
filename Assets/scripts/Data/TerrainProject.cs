@@ -1,9 +1,8 @@
 using System;
 using UnityEngine;
 
-
 [Serializable]
-public class TerrainProject : MonoBehaviour
+public class TerrainProject
 {
     [Header("Project Metadata")]
     public string projectName = "New Project";
@@ -14,16 +13,20 @@ public class TerrainProject : MonoBehaviour
     [Header("Terrain Data")]
     public TerrainData terrainData;
 
-    public TerrainProject()
+    // Initialize with default values
+    public void Initialize()
     {
         projectName = "New Project";
         version = "1.0";
         creationDate = System.DateTime.Now.ToString();
         lastModifiedDate = creationDate;
+
         terrainData = new TerrainData();
+        terrainData.Initialize();
     }
 
-    public TerrainProject(string name, TerrainData data)
+    // Initialize with name and terrain data
+    public void Initialize(string name, TerrainData data)
     {
         projectName = name;
         version = "1.0";

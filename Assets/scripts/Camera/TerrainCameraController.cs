@@ -66,12 +66,38 @@ public class TerrainCameraController : MonoBehaviour
     private void HandlePan()
     {
         // Middle mouse button = pan
-        if (Input.GetMouseButton(2) || (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetMouseButton(2) || (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftShift)))
         {
             Vector3 delta = Input.mousePosition - lastMousePosition;
 
             Vector3 right = transform.right * delta.x * panSpeed * Time.deltaTime * 0.01f;
+            Vector3 up = transform.up * delta.y * panSpeed * Time.deltaTime * 0.01f;
 
+            Vector3 movement = right + up;
+            transform.position -= movement;
+            target.position -= movement;
         }
+    }
+
+
+
+    private void HandleZoom()
+    {
+        // Mouse scroll wheel = zoom
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (Mathf.Abs(scroll) > 0.01f)
+        {
+            currentZoom -= scroll * zoomSpeed;
+            currentZoom = Mathf.Clamp(currentZoom, minZoom, maxZoom);
+
+            // Update camera position based on zoom
+            Vector3 direction = (transform.position - target.position).normalized;
+            transform.position = target.position + direction * currentZoom;
+        }
+    }
+
+    private void LateUpdate()
+    {
+        lastMousePosition = Input.mousePosition;
     }
 }
