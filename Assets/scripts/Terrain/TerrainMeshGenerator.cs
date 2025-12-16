@@ -85,6 +85,27 @@ public class TerrainMeshGenerator : MonoBehaviour
             }
         }
 
+        // Assign data to mesh
+        terrainMesh.vertices = vertices;
+        terrainMesh.triangles = triangles;
+        terrainMesh.uv = uvs;
+
+        // Recalculate normals for lighting
+        terrainMesh.RecalculateNormals();
+
+        // Recalculate bounds
+        terrainMesh.RecalculateBounds();
+
+        // Assign mesh to MeshFilter
+        meshFilter.mesh = terrainMesh;
+
+        // Set default material if none exists
+        if (meshRenderer.sharedMaterial == null)
+        {
+            Material defaultMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            meshRenderer.sharedMaterial = defaultMaterial;
+        }
+
     }
 
 }
