@@ -64,6 +64,8 @@ public class TerrainManager : MonoBehaviour
         GenerateTerrainMesh();
     }
 
+
+    // Create a new terrain project
     public void CreateNewTerrain(string projectName, int width, int height)
     {
         terrainWidth = width;
@@ -78,13 +80,17 @@ public class TerrainManager : MonoBehaviour
         GenerateTerrainMesh();
     }
 
-
-
-
-
-
     // Generate the mesh from current terrain data
     private void GenerateTerrainMesh()
+    {
+        if (meshGenerator != null && currentTerrainData != null)
+        {
+            meshGenerator.GenerateMesh(currentTerrainData);
+        }
+    }
+
+    // Update the mesh when terrain data changes
+    public void UpdateMesh()
     {
         if (meshGenerator != null && currentTerrainData != null)
         {
