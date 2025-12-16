@@ -50,7 +50,7 @@ public class TerrainData : MonoBehaviour
     // Gets the height at the specified grid coordinates
     public float GetHeight(int x, int y)
     {
-        if (x < 0 || x >= width || y < 0 || y >= height)\
+        if (x < 0 || x >= width || y < 0 || y >= height)
             return 0f;
 
 
@@ -66,5 +66,25 @@ public class TerrainData : MonoBehaviour
         return GetHeight(x, y) * verticalScale;
     }
 
-    public float Resize()
+    // Resize terrain (creates new heightmap)
+    public void Resize(int newWidth, int newHeight)
+    {
+        float[] newHeightMap = new float[newWidth * newHeight];
+
+        // Copy old data (with clamping)
+        int minWidth = Mathf.Min(width, newWidth);
+        int minHeight = Mathf.Min(height, newHeight);
+
+        for (int y = 0; y < minHeight; y++)
+        {
+            for (int x = 0; x < minWidth; x++)
+            {
+                newHeightMap[x + y * newWidth] = heightMap[x + y * width];
+            }
+        }
+
+        width = newWidth;
+        height = newHeight;
+        heightMap = newHeightMap;
+    }
 }
