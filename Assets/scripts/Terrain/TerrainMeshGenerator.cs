@@ -2,10 +2,12 @@ using UnityEngine;
 
 public class TerrainMeshGenerator : MonoBehaviour
 {
+    [Header("Material Settings")]
+    [SerializeField] private Material terrainMaterial;
+
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
     private Mesh terrainMesh;
-
 
     private void Awake()
     {
@@ -106,12 +108,22 @@ public class TerrainMeshGenerator : MonoBehaviour
 
         meshCollider.sharedMesh = terrainMesh;
 
-        // Set default material if none exists
-        if (meshRenderer.sharedMaterial == null)
+        // Set material and shadow settings
+        if (terrainMaterial != null)
+        {
+            meshRenderer.sharedMaterial = terrainMaterial;
+        }
+        else if (meshRenderer.sharedMaterial == null)
         {
             Material defaultMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            defaultMaterial.color = new Color(0.7f, 0.75f, 0.7f);
+            defaultMaterial.SetFloat("_Smoothness", 0.2f);
+            defaultMaterial.SetFloat("_Metallic", 0f);
             meshRenderer.sharedMaterial = defaultMaterial;
         }
+
+        meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        meshRenderer.receiveShadows = true;
 
         Debug.Log($"Generated terrain mesh: {width}x{height} vertices");
     }
