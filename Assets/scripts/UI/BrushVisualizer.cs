@@ -40,6 +40,31 @@ public class BrushVisualizer : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        
+        if (!showBrush || brushManager == null)
+            return;
+
+        float brushSize = brushManager.GetBrushSize();
+
+        Gizmos.color = brushColor;
+
+        DrawCircle(currentBrushPosition, brushSize, circleSegments);
+
+        Gizmos.DrawSphere(currentBrushPosition, 0.2f);
+    }
+
+    private void DrawCircle(Vector3 center, float radius, int segments)
+    {
+        float angleStep = 360f / segments;
+        Vector3 prevPoint = center + new Vector3(radius, 0f, 0f);
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = angleStep * i * Mathf.Deg2Rad;
+            Vector3 newPoint = center + new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius);
+
+            Gizmos.DrawLine(prevPoint, newPoint);
+            prevPoint = newPoint;
+        }
+
     }
 }
