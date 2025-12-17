@@ -15,4 +15,31 @@ public class BrushVisualizer : MonoBehaviour
     private bool showBrush = false;
 
 
+    private void Start()
+    {
+        if (brushManager == null)
+            brushManager = FindFirstObjectByType<BrushManager>();
+
+        if (raycaster == null)
+            raycaster = FindFirstObjectByType<TerrainRaycaster>();
+
+    }
+
+    private void Update()
+    {
+        if (raycaster != null && raycaster.RaycastTerrain(out Vector3 hitPoint, out Vector3 hitNormal))
+        {
+            currentBrushPosition = hitPoint + Vector3.up * circleHeight;
+            showBrush = true;
+        }
+        else
+        {
+            showBrush = false;
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        
+    }
 }
