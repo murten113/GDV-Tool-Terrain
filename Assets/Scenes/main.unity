@@ -8531,7 +8531,9 @@ MonoBehaviour:
   formatDropdown: {fileID: 1467820509}
   exportButton: {fileID: 1221633923}
   cancelButton: {fileID: 1822989035}
-  defaultExportPath: C:/Exports/
+  defaultExportDirectory: Exports
+  saveLoadManager: {fileID: 1635623943}
+  terrainManager: {fileID: 1199876352}
 --- !u!1 &1715245359
 GameObject:
   m_ObjectHideFlags: 0

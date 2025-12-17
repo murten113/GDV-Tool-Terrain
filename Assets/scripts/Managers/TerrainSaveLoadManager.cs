@@ -135,4 +135,186 @@ public class TerrainSaveLoadManager : MonoBehaviour
         string fileName = Path.GetFileNameWithoutExtension(filePath);
         return fileName;
     }
+
+
+    #region ExportOBJ
+    /// <summary>
+    /// Export terrain mesh as OBJ file
+    /// </summary>
+    public bool ExportAsOBJ(string filePath, TerrainProject project)
+    {
+        if (project == null || project.terrainData == null)
+        {
+            Debug.LogError("Cannot export: Project or terrain data is null!");
+            return false;
+        }
+
+        try
+        {
+            // Ensure directory exists
+            string directory = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            // Ensure .obj extension
+            if (!filePath.EndsWith(".obj", System.StringComparison.OrdinalIgnoreCase))
+            {
+                filePath += ".obj";
+            }
+
+            // Generate OBJ content
+            string objContent = GenerateOBJContent(project.terrainData);
+
+            // Write to file
+            File.WriteAllText(filePath, objContent);
+
+            Debug.Log($"Terrain exported as OBJ to: {filePath}");
+            return true;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Failed to export terrain as OBJ: {e.Message}");
+            return false;
+        }
+    }
+    #endregion
+
+    #region ExportHeightmapPNG
+    /// <summary>
+    /// Export heightmap as PNG image
+    /// </summary>
+    public bool ExportHeightmapPNG(string filePath, TerrainProject project)
+    {
+        if (project == null || project.terrainData == null)
+        {
+            Debug.LogError("Cannot export: Project or terrain data is null!");
+            return false;
+        }
+
+        try
+        {
+            // Ensure directory exists
+            string directory = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            // Ensure .png extension
+            if (!filePath.EndsWith(".png", System.StringComparison.OrdinalIgnoreCase))
+            {
+                filePath += ".png";
+            }
+
+            TerrainData data = project.terrainData;
+
+            // Create texture from heightmap
+            Texture2D heightmapTexture = new Texture2D(data.width, data.height);
+
+            for (int y = 0; y < data.height; y++)
+            {
+                for (int x = 0; x < data.width; x++)
+                {
+                    float height = data.GetHeight(x, y);
+                    // Normalize height to 0-1 range for grayscale
+                    float normalizedHeight = Mathf.Clamp01(height);
+                    Color pixel = new Color(normalizedHeight, normalizedHeight, normalizedHeight, 1f);
+                    heightmapTexture.SetPixel(x, y, pixel);
+                }
+            }
+
+            heightmapTexture.Apply();
+
+            // Encode to PNG
+            byte[] pngData = heightmapTexture.EncodeToPNG();
+
+            // Clean up texture
+            Object.Destroy(heightmapTexture);
+
+            // Write to file
+            File.WriteAllBytes(filePath, pngData);
+
+            Debug.Log($"Heightmap exported as PNG to: {filePath}");
+            return true;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Failed to export heightmap as PNG: {e.Message}");
+            return false;
+        }
+    }
+    #endregion
+
+    #region OBJGeneration
+    /// <summary>
+    /// Generate OBJ file content from terrain data
+    /// </summary>
+    private string GenerateOBJContent(TerrainData terrainData)
+    {
+        System.Text.StringBuilder obj = new System.Text.StringBuilder();
+
+        // Header
+        obj.AppendLine("# Terrain Editor Export");
+        obj.AppendLine($"# Size: {terrainData.width}x{terrainData.height}");
+        obj.AppendLine();
+
+        // Vertices
+        obj.AppendLine("# Vertices");
+        for (int y = 0; y <= terrainData.height; y++)
+        {
+            for (int x = 0; x <= terrainData.width; x++)
+            {
+                int heightmapX = Mathf.Min(x, terrainData.width - 1);
+                int heightmapY = Mathf.Min(y, terrainData.height - 1);
+                float heightValue = terrainData.GetHeight(heightmapX, heightmapY) * terrainData.verticalScale;
+
+                float worldX = x * terrainData.horizontalScale;
+                float worldY = heightValue;
+                float worldZ = y * terrainData.horizontalScale;
+
+                obj.AppendLine($"v {worldX} {worldY} {worldZ}");
+            }
+        }
+        obj.AppendLine();
+
+        // Texture coordinates (UVs)
+        obj.AppendLine("# Texture Coordinates");
+        for (int y = 0; y <= terrainData.height; y++)
+        {
+            for (int x = 0; x <= terrainData.width; x++)
+            {
+                float u = (float)x / terrainData.width;
+                float v = (float)y / terrainData.height;
+                obj.AppendLine($"vt {u} {v}");
+            }
+        }
+        obj.AppendLine();
+
+        // Faces (triangles)
+        obj.AppendLine("# Faces");
+        int vertexWidth = terrainData.width + 1;
+
+        for (int y = 0; y < terrainData.height; y++)
+        {
+            for (int x = 0; x < terrainData.width; x++)
+            {
+                // OBJ indices start at 1, not 0
+                int bottomLeft = (x + y * vertexWidth) + 1;
+                int bottomRight = ((x + 1) + y * vertexWidth) + 1;
+                int topLeft = (x + (y + 1) * vertexWidth) + 1;
+                int topRight = ((x + 1) + (y + 1) * vertexWidth) + 1;
+
+                // First triangle
+                obj.AppendLine($"f {bottomLeft}/{bottomLeft} {topLeft}/{topLeft} {topRight}/{topRight}");
+
+                // Second triangle
+                obj.AppendLine($"f {bottomLeft}/{bottomLeft} {topRight}/{topRight} {bottomRight}/{bottomRight}");
+            }
+        }
+
+        return obj.ToString();
+    }
+    #endregion
 }
