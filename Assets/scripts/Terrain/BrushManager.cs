@@ -97,13 +97,27 @@ public class BrushManager : MonoBehaviour
 
     private void Update()
     {
-
         // Handle hotkey adjustments
         HandleHotkeys();
 
+        // Handle brush size adjustment
+        if (isAdjustingSize)
+        {
+            float mouseDelta = Input.GetAxis("Mouse X") + Input.GetAxis("Mouse Y");
+            float newSize = brushSize + (mouseDelta * sizeAdjustSpeed);
+            SetBrushSize(Mathf.Clamp(newSize, minBrushSize, maxBrushSize));
+        }
+
+        // Handle brush strength adjustment
+        if (isAdjustingStrength)
+        {
+            float mouseDelta = Input.GetAxis("Mouse X") + Input.GetAxis("Mouse Y");
+            float newStrength = brushStrength + (mouseDelta * strengthAdjustSpeed);
+            SetBrushStrength(Mathf.Clamp(newStrength, minBrushStrength, maxBrushStrength));
+        }
 
         // Check if we should paint
-        if (Input.GetMouseButton(0) && currentBrush != null)
+        if (Input.GetMouseButton(0) && currentBrush != null && !isAdjustingSize && !isAdjustingStrength)
         {
             Paint();
         }
@@ -117,7 +131,39 @@ public class BrushManager : MonoBehaviour
 
     private void HandleHotkeys()
     {
+        // F key: Toggle size adjustment
+        if (Input.GetKeyDown(KeyCode.F) && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
+        {
+            isAdjustingSize = !isAdjustingSize;
+            isAdjustingStrength = false; // Cancel strength adjustment
+            
+            if (isAdjustingSize)
+                Debug.Log("Brush Size Adjustment Mode: Move mouse to adjust");
+            else
+                Debug.Log("Brush Size Adjustment Mode: OFF");
+        }
         
+        // Shift+F key: Toggle strength adjustment
+        if (Input.GetKeyDown(KeyCode.F) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
+        {
+            isAdjustingStrength = !isAdjustingStrength;
+            isAdjustingSize = false; // Cancel size adjustment
+
+            if (isAdjustingStrength)
+                Debug.Log("Brush Strength Adjustment Mode: Move mouse to adjust");
+            else
+                Debug.Log("Brush Strength Adjustment Mode: OFF");            
+        }
+
+        // Exit adjustment modes on mouse click or Escape
+        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (isAdjustingSize || isAdjustingStrength)
+            {
+                isAdjustingSize = false;
+                isAdjustingStrength = false;
+            }
+        }
     }
     // Paint at mouse position
     private void Paint()
