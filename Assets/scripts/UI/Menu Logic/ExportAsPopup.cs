@@ -1,18 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.IO;
 
 public class ExportAsPopup : MonoBehaviour
 {
     [Header("UI References")]
-    [SerializeField] private TMP_InputField exportPathInput;
     [SerializeField] private TMP_Dropdown formatDropdown;
     [SerializeField] private Button exportButton;
     [SerializeField] private Button cancelButton;
-
-    [Header("Default Settings")]
-    [SerializeField] private string defaultExportDirectory = "Exports";
 
     [Header("References")]
     [SerializeField] private TerrainSaveLoadManager saveLoadManager;
@@ -26,13 +21,6 @@ public class ExportAsPopup : MonoBehaviour
 
         if (terrainManager == null)
             terrainManager = FindFirstObjectByType<TerrainManager>();
-
-        // Set default export path
-        if (exportPathInput != null)
-        {
-            string defaultPath = Path.Combine(Application.persistentDataPath, defaultExportDirectory);
-            exportPathInput.text = defaultPath;
-        }
 
         // Setup format dropdown options
         if (formatDropdown != null)
@@ -69,40 +57,38 @@ public class ExportAsPopup : MonoBehaviour
             return;
         }
 
-        // Get export directory
-        string exportDirectory = exportPathInput != null ? exportPathInput.text :
-            Path.Combine(Application.persistentDataPath, defaultExportDirectory);
-
-        // Ensure directory exists
-        if (!Directory.Exists(exportDirectory))
-        {
-            Directory.CreateDirectory(exportDirectory);
-        }
-
         // Get selected format
         int formatIndex = formatDropdown != null ? formatDropdown.value : 0;
 
-        // Generate filename
-        string projectName = currentProject.projectName.Replace(" ", "_");
-        string fileName = "";
-        bool success = false;
+        // Determine extension and default name
+        string extension = formatIndex == 0 ? "obj" : "png";
+        string defaultName = currentProject.projectName.Replace(" ", "_");
+        if (formatIndex == 1)
+            defaultName += "_heightmap";
 
-        switch (formatIndex)
+        // Show file browser dialog
+        string filePath = saveLoadManager.ShowExportDialog(defaultName, extension);
+
+        if (string.IsNullOrEmpty(filePath))
         {
-            case 0: // OBJ
-                fileName = Path.Combine(exportDirectory, $"{projectName}.obj");
-                success = saveLoadManager.ExportAsOBJ(fileName, currentProject);
-                break;
+            Debug.Log("Export cancelled by user");
+            return;
+        }
 
-            case 1: // PNG Heightmap
-                fileName = Path.Combine(exportDirectory, $"{projectName}_heightmap.png");
-                success = saveLoadManager.ExportHeightmapPNG(fileName, currentProject);
-                break;
+        // Perform export
+        bool success = false;
+        if (formatIndex == 0) // OBJ
+        {
+            success = saveLoadManager.ExportAsOBJ(filePath, currentProject);
+        }
+        else // PNG
+        {
+            success = saveLoadManager.ExportHeightmapPNG(filePath, currentProject);
         }
 
         if (success)
         {
-            Debug.Log($"Export successful! File saved to: {fileName}");
+            Debug.Log($"Export successful! File saved to: {filePath}");
         }
         else
         {
@@ -120,12 +106,6 @@ public class ExportAsPopup : MonoBehaviour
 
     private void OnEnable()
     {
-        if (exportPathInput != null)
-        {
-            string defaultPath = Path.Combine(Application.persistentDataPath, defaultExportDirectory);
-            exportPathInput.text = defaultPath;
-        }
-
         // Reset dropdown to first option
         if (formatDropdown != null)
             formatDropdown.value = 0;

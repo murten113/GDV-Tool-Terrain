@@ -400,4 +400,32 @@ public class TerrainSaveLoadManager : MonoBehaviour
         return obj.ToString();
     }
     #endregion
+
+    
+    /// <summary>
+    /// Show export dialog with both OBJ and PNG format options
+    /// </summary>
+    public string ShowExportDialogWithFormat(string defaultName = "terrain_export")
+    {
+#if UNITY_STANDALONE || UNITY_EDITOR
+        string defaultPath = Path.Combine(Application.persistentDataPath, "Exports");
+        if (!Directory.Exists(defaultPath))
+            Directory.CreateDirectory(defaultPath);
+
+        string defaultFileName = $"{defaultName}.obj";
+        
+        ExtensionFilter[] extensions = new[] {
+            new ExtensionFilter("OBJ File", "obj"),
+            new ExtensionFilter("PNG Image", "png"),
+        };
+
+        string path = StandaloneFileBrowser.SaveFilePanel("Export Terrain", defaultPath, defaultFileName, extensions);
+        return path;
+#else
+        string defaultPath = Path.Combine(Application.persistentDataPath, "Exports");
+        if (!Directory.Exists(defaultPath))
+            Directory.CreateDirectory(defaultPath);
+        return Path.Combine(defaultPath, $"{defaultName}.obj");
+#endif
+    }
 }
