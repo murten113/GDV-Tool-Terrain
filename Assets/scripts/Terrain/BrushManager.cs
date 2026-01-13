@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BrushManager : MonoBehaviour
@@ -11,15 +13,11 @@ public class BrushManager : MonoBehaviour
     [SerializeField] private float brushSize = 5f;
     [SerializeField] private float brushStrength = 1f;
 
+
+    private Dictionary<Type, BaseBrush> brushes = new Dictionary<Type, BaseBrush>();
+    private Type currentBrushType;
     private BaseBrush currentBrush;
     private TerrainRaycaster raycaster;
-
-    public enum BrushType
-    {
-        Raise,
-        Lower,
-        Flatten
-    }
 
     private void Start()
     {
@@ -28,9 +26,63 @@ public class BrushManager : MonoBehaviour
         if (raycaster == null)
             Debug.LogError("BrushManager: TerrainRaycaster not found!");
 
-        // Set default brush settings
+        RegisterBrush(typeof(RaiseBrush), raiseBrush);
+        RegisterBrush(typeof(LowerBrush), lowerBrush);
+        RegisterBrush(typeof(FlattenBrush), flattenBrush);
+        
+        // Set default brush
+        if (brushes.Count > 0)
+        {
+            SetActiveBrush(typeof(RaiseBrush));
+        }
+        
         UpdateBrushSettings();
     }
+
+    public void RegisterBrush(Type brushType, BaseBrush brushInstance)
+    {
+        if (brushInstance == null)
+        {
+            Debug.LogWarning($"cannot register null brush instance for type {brushType}");
+            return;
+        }
+
+        if (!brushType.IsSubclassOf(typeof(BaseBrush)) && brushType != typeof(BaseBrush))
+        {
+            Debug.LogError($"Type {brushType} is not a subclass of BaseBrush");
+            return;
+        }
+
+        brushes[brushType] = brushInstance;
+        Debug.Log($"Registered brush: {brushType.Name}");
+    }
+
+    // Set active brush by Type
+    public void SetActiveBrush(Type brushType)
+    {
+        if (!brushes.ContainsKey(brushType))
+        {
+            Debug.LogError($"Brush type {brushType} not registered!");
+            return;
+        }
+
+        // Reset flatten brush if switching away
+        if (currentBrush != null && currentBrush.GetType() == typeof(FlattenBrush))
+        {
+            FlattenBrush flatten = currentBrush as FlattenBrush;
+            if (flatten != null)
+                flatten.ResetFlattenHeight();
+        }
+
+        currentBrushType = brushType;
+        currentBrush = brushes[brushType];
+        UpdateBrushSettings();
+
+        Debug.Log($"Active brush: {brushType.Name}");
+    }
+
+    // Get active brush type
+    public Type GetActiveBrushType() => currentBrushType;
 
     private void Update()
     {
@@ -47,30 +99,7 @@ public class BrushManager : MonoBehaviour
         }
     }
 
-    // Set the active brush
-    public void SetActiveBrush(BrushType brushType)
-    {
-        // Reset flatten brush if switching away
-        if (flattenBrush != null && currentBrush != null && currentBrush.GetType() == typeof(FlattenBrush))
-        {
-            flattenBrush.ResetFlattenHeight();
-        }
 
-        switch (brushType)
-        {
-            case BrushType.Raise:
-                currentBrush = raiseBrush;
-                break;
-            case BrushType.Lower:
-                currentBrush = lowerBrush;
-                break;
-            case BrushType.Flatten:
-                currentBrush = flattenBrush;
-                break;
-        }
-
-        Debug.Log($"Active brush: {brushType}");
-    }
 
     // Paint at mouse position
     private void Paint()
