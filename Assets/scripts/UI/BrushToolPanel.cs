@@ -32,7 +32,7 @@ public class BrushToolPanel : MonoBehaviour
     {
         if (brushManager != null)
         {
-            brushManager.SetActiveBrush(BrushManager.BrushType.Raise);
+            brushManager.SetActiveBrush(typeof(RaiseBrush));
             SetActiveButton(raiseButton);
         }
     }
@@ -41,7 +41,7 @@ public class BrushToolPanel : MonoBehaviour
     {
         if (brushManager != null)
         {
-            brushManager.SetActiveBrush(BrushManager.BrushType.Lower);
+            brushManager.SetActiveBrush(typeof(LowerBrush));
             SetActiveButton(lowerButton);
         }
     }
@@ -50,7 +50,7 @@ public class BrushToolPanel : MonoBehaviour
     {
         if (brushManager != null)
         {
-            brushManager.SetActiveBrush(BrushManager.BrushType.Flatten);
+            brushManager.SetActiveBrush(typeof(FlattenBrush));
             SetActiveButton(flattenButton);
         }
     }

@@ -14,6 +14,17 @@ public class BrushManager : MonoBehaviour
     [SerializeField] private float brushStrength = 1f;
 
 
+    [Header("Hotkey Settings")]
+    [SerializeField] private float sizeAdjustSpeed = 0.5f;
+    [SerializeField] private float strengthAdjustSpeed = 0.1f;
+    [SerializeField] private float minBrushSize = 0.5f;
+    [SerializeField] private float maxBrushSize = 50f;
+    [SerializeField] private float minBrushStrength = 0.1f;
+    [SerializeField] private float maxBrushStrength = 10f;
+
+    private bool isAdjustingSize = false;
+    private bool isAdjustingStrength = false;
+
     private Dictionary<Type, BaseBrush> brushes = new Dictionary<Type, BaseBrush>();
     private Type currentBrushType;
     private BaseBrush currentBrush;
@@ -86,6 +97,11 @@ public class BrushManager : MonoBehaviour
 
     private void Update()
     {
+
+        // Handle hotkey adjustments
+        HandleHotkeys();
+
+
         // Check if we should paint
         if (Input.GetMouseButton(0) && currentBrush != null)
         {
@@ -99,8 +115,10 @@ public class BrushManager : MonoBehaviour
         }
     }
 
-
-
+    private void HandleHotkeys()
+    {
+        
+    }
     // Paint at mouse position
     private void Paint()
     {
