@@ -1,6 +1,8 @@
 using System.IO;
 using UnityEngine;
-
+#if UNITY_STANDALONE || UNITY_EDITOR
+using SFB;
+#endif
 public class TerrainSaveLoadManager : MonoBehaviour
 {
     private static TerrainSaveLoadManager instance;
@@ -37,11 +39,92 @@ public class TerrainSaveLoadManager : MonoBehaviour
     }
 
     // Get full file path for a project
-    private string GetProjectFilePath(string projectName)
+    public string GetProjectFilePath(string projectName)
     {
         string fileName = $"{projectName}.terrain";
         return Path.Combine(GetSaveDirectory(), fileName);
     }
+
+
+#region File Browser Methods
+    
+    /// <summary>
+    /// Show save dialog and return selected path
+    /// </summary>
+    public string ShowSaveDialog(string defaultName = "NewProject")
+    {
+#if UNITY_STANDALONE || UNITY_EDITOR
+        string defaultPath = GetSaveDirectory();
+        string defaultFileName = $"{defaultName}.terrain";
+        
+        ExtensionFilter[] extensions = new[] {
+            new ExtensionFilter("Terrain Project", "terrain"),
+        };
+
+        string path = StandaloneFileBrowser.SaveFilePanel("Save Terrain Project", defaultPath, defaultFileName, extensions);
+        return path;
+#else
+        // Fallback for platforms without file browser
+        return GetProjectFilePath(defaultName);
+#endif
+    }
+
+    /// <summary>
+    /// Show load dialog and return selected path
+    /// </summary>
+    public string ShowLoadDialog()
+    {
+#if UNITY_STANDALONE || UNITY_EDITOR
+        string defaultPath = GetSaveDirectory();
+        
+        ExtensionFilter[] extensions = new[] {
+            new ExtensionFilter("Terrain Project", "terrain"),
+        };
+
+        string[] paths = StandaloneFileBrowser.OpenFilePanel("Load Terrain Project", defaultPath, extensions, false);
+        
+        if (paths != null && paths.Length > 0)
+            return paths[0];
+        
+        return null; // User cancelled
+#else
+        return null;
+#endif
+    }
+
+    /// <summary>
+    /// Show export dialog and return selected path
+    /// </summary>
+    public string ShowExportDialog(string defaultName = "terrain_export", string extension = "obj")
+    {
+#if UNITY_STANDALONE || UNITY_EDITOR
+        string defaultPath = Path.Combine(Application.persistentDataPath, "Exports");
+        if (!Directory.Exists(defaultPath))
+            Directory.CreateDirectory(defaultPath);
+
+        string defaultFileName = $"{defaultName}.{extension}";
+        
+        ExtensionFilter[] extensions;
+        if (extension == "obj")
+        {
+            extensions = new[] { new ExtensionFilter("OBJ File", "obj") };
+        }
+        else
+        {
+            extensions = new[] { new ExtensionFilter("PNG Image", "png") };
+        }
+
+        string path = StandaloneFileBrowser.SaveFilePanel("Export Terrain", defaultPath, defaultFileName, extensions);
+        return path;
+#else
+        string defaultPath = Path.Combine(Application.persistentDataPath, "Exports");
+        if (!Directory.Exists(defaultPath))
+            Directory.CreateDirectory(defaultPath);
+        return Path.Combine(defaultPath, $"{defaultName}.{extension}");
+#endif
+    }
+    
+#endregion
 
     // Save project to file
     public bool SaveProject(TerrainProject project, string filePath = null)
