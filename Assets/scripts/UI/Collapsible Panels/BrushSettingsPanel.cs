@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Unity.VisualScripting;
-
 
 public class BrushSettingsPanel : CollapsiblePanel
 {
@@ -12,8 +10,9 @@ public class BrushSettingsPanel : CollapsiblePanel
     [Header("UI References")]
     [SerializeField] private Slider brushSizeSlider;
     [SerializeField] private Slider brushStrengthSlider;
-    [SerializeField] private TextMeshProUGUI brushSieText;
+    [SerializeField] private TextMeshProUGUI brushSizeText;
     [SerializeField] private TextMeshProUGUI brushStrengthText;
+    [SerializeField] private TextMeshProUGUI hotkeyFeedbackText; // For visual feedback
 
     [Header("References")]
     [SerializeField] private BrushManager brushManager;
@@ -24,11 +23,11 @@ public class BrushSettingsPanel : CollapsiblePanel
     [SerializeField] private float minBrushStrength = 0.1f;
     [SerializeField] private float maxBrushStrength = 5f;
 
+    private bool isUpdatingFromManager = false; // Prevent circular updates
+
     protected override void SetupCollapsedPosition()
     {
         base.SetupCollapsedPosition();
-
-        // Collapsed: hide panel below (off-screen)
         collapsedPosition = new Vector2(expandedPosition.x, -panelHeight);
     }
 
@@ -37,6 +36,15 @@ public class BrushSettingsPanel : CollapsiblePanel
         // Initialize UI elements
         if (brushManager == null)
             brushManager = FindFirstObjectByType<BrushManager>();
+
+        if (brushManager != null)
+        {
+            // Subscribe to events
+            brushManager.OnBrushSizeChanged += OnBrushSizeChangedFromManager;
+            brushManager.OnBrushStrengthChanged += OnBrushStrengthChangedFromManager;
+            brushManager.OnSizeAdjustModeChanged += OnSizeAdjustModeChanged;
+            brushManager.OnStrengthAdjustModeChanged += OnStrengthAdjustModeChanged;
+        }
 
         // Initialize sliders
         if (brushSizeSlider != null)
@@ -56,32 +64,95 @@ public class BrushSettingsPanel : CollapsiblePanel
         }
 
         // Update text labels
-        UpdateTextlabels();
+        UpdateTextLabels();
+        UpdateHotkeyFeedback(""); // Clear initial feedback
+    }
+
+    private void OnDestroy()
+    {
+        // Unsubscribe from events
+        if (brushManager != null)
+        {
+            brushManager.OnBrushSizeChanged -= OnBrushSizeChangedFromManager;
+            brushManager.OnBrushStrengthChanged -= OnBrushStrengthChangedFromManager;
+            brushManager.OnSizeAdjustModeChanged -= OnSizeAdjustModeChanged;
+            brushManager.OnStrengthAdjustModeChanged -= OnStrengthAdjustModeChanged;
+        }
+    }
+
+    // Called when brush size changes from BrushManager (hotkeys)
+    private void OnBrushSizeChangedFromManager(float size)
+    {
+        if (brushSizeSlider != null && !isUpdatingFromManager)
+        {
+            isUpdatingFromManager = true;
+            brushSizeSlider.value = size;
+            isUpdatingFromManager = false;
+            UpdateTextLabels();
+        }
+    }
+
+    // Called when brush strength changes from BrushManager (hotkeys)
+    private void OnBrushStrengthChangedFromManager(float strength)
+    {
+        if (brushStrengthSlider != null && !isUpdatingFromManager)
+        {
+            isUpdatingFromManager = true;
+            brushStrengthSlider.value = strength;
+            isUpdatingFromManager = false;
+            UpdateTextLabels();
+        }
+    }
+
+    // Called when size adjustment mode changes
+    private void OnSizeAdjustModeChanged(bool isActive)
+    {
+        if (isActive)
+        {
+            UpdateHotkeyFeedback("Adjusting Brush Size (F to exit)");
+        }
+        else
+        {
+            UpdateHotkeyFeedback("");
+        }
+    }
+
+    // Called when strength adjustment mode changes
+    private void OnStrengthAdjustModeChanged(bool isActive)
+    {
+        if (isActive)
+        {
+            UpdateHotkeyFeedback("Adjusting Brush Strength (Shift+F to exit)");
+        }
+        else
+        {
+            UpdateHotkeyFeedback("");
+        }
     }
 
     private void OnBrushSizeChanged(float value)
     {
-        if (brushManager != null)
+        if (!isUpdatingFromManager && brushManager != null)
         {
             brushManager.SetBrushSize(value);
         }
-        UpdateTextlabels();
+        UpdateTextLabels();
     }
 
     private void OnBrushStrengthChanged(float value)
     {
-        if (brushManager != null)
+        if (!isUpdatingFromManager && brushManager != null)
         {
             brushManager.SetBrushStrength(value);
         }
-        UpdateTextlabels();
+        UpdateTextLabels();
     }
 
-    private void UpdateTextlabels()
+    private void UpdateTextLabels()
     {
-        if(brushSieText != null && brushSizeSlider != null)
+        if (brushSizeText != null && brushSizeSlider != null)
         {
-            brushSieText.text = $"Brush size: {brushSizeSlider.value:F1}";
+            brushSizeText.text = $"Brush size: {brushSizeSlider.value:F1}";
         }
 
         if (brushStrengthText != null && brushStrengthSlider != null)
@@ -90,6 +161,14 @@ public class BrushSettingsPanel : CollapsiblePanel
         }
     }
 
+    private void UpdateHotkeyFeedback(string message)
+    {
+        if (hotkeyFeedbackText != null)
+        {
+            hotkeyFeedbackText.text = message;
+            // Optional: Change color or add animation here
+        }
+    }
 
     public void OnToggleButtonClicked()
     {

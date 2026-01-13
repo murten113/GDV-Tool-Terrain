@@ -25,6 +25,12 @@ public class BrushManager : MonoBehaviour
     private bool isAdjustingSize = false;
     private bool isAdjustingStrength = false;
 
+    // Events for UI updates
+    public System.Action<float> OnBrushSizeChanged;
+    public System.Action<float> OnBrushStrengthChanged;
+    public System.Action<bool> OnSizeAdjustModeChanged; // true = adjusting size
+    public System.Action<bool> OnStrengthAdjustModeChanged; // true = adjusting strength
+
     private Dictionary<Type, BaseBrush> brushes = new Dictionary<Type, BaseBrush>();
     private Type currentBrushType;
     private BaseBrush currentBrush;
@@ -131,16 +137,20 @@ public class BrushManager : MonoBehaviour
 
     private void HandleHotkeys()
     {
+        bool wasAdjustingSize = isAdjustingSize;
+        bool wasAdjustingStrength = isAdjustingStrength;
+
         // F key: Toggle size adjustment
         if (Input.GetKeyDown(KeyCode.F) && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
         {
             isAdjustingSize = !isAdjustingSize;
             isAdjustingStrength = false; // Cancel strength adjustment
             
-            if (isAdjustingSize)
-                Debug.Log("Brush Size Adjustment Mode: Move mouse to adjust");
-            else
-                Debug.Log("Brush Size Adjustment Mode: OFF");
+            if (isAdjustingSize != wasAdjustingSize)
+            {
+                OnSizeAdjustModeChanged?.Invoke(isAdjustingSize);
+                Debug.Log(isAdjustingSize ? "Brush Size Adjustment Mode: ON (Move mouse to adjust)" : "Brush Size Adjustment Mode: OFF");
+            }
         }
         
         // Shift+F key: Toggle strength adjustment
@@ -148,11 +158,12 @@ public class BrushManager : MonoBehaviour
         {
             isAdjustingStrength = !isAdjustingStrength;
             isAdjustingSize = false; // Cancel size adjustment
-
-            if (isAdjustingStrength)
-                Debug.Log("Brush Strength Adjustment Mode: Move mouse to adjust");
-            else
-                Debug.Log("Brush Strength Adjustment Mode: OFF");            
+            
+            if (isAdjustingStrength != wasAdjustingStrength)
+            {
+                OnStrengthAdjustModeChanged?.Invoke(isAdjustingStrength);
+                Debug.Log(isAdjustingStrength ? "Brush Strength Adjustment Mode: ON (Move mouse to adjust)" : "Brush Strength Adjustment Mode: OFF");
+            }
         }
 
         // Exit adjustment modes on mouse click or Escape
@@ -160,11 +171,17 @@ public class BrushManager : MonoBehaviour
         {
             if (isAdjustingSize || isAdjustingStrength)
             {
+                bool wasSize = isAdjustingSize;
+                bool wasStrength = isAdjustingStrength;
                 isAdjustingSize = false;
                 isAdjustingStrength = false;
+                
+                if (wasSize) OnSizeAdjustModeChanged?.Invoke(false);
+                if (wasStrength) OnStrengthAdjustModeChanged?.Invoke(false);
             }
         }
     }
+
     // Paint at mouse position
     private void Paint()
     {
@@ -185,12 +202,14 @@ public class BrushManager : MonoBehaviour
     {
         brushSize = size;
         UpdateBrushSettings();
+        OnBrushSizeChanged?.Invoke(brushSize); // Notify UI
     }
 
     public void SetBrushStrength(float strength)
     {
         brushStrength = strength;
         UpdateBrushSettings();
+        OnBrushStrengthChanged?.Invoke(brushStrength); // Notify UI
     }
 
     private void UpdateBrushSettings()

@@ -73,20 +73,45 @@ public class NewProjectPopup : MonoBehaviour
         if (terrainHeightInput != null && int.TryParse(terrainHeightInput.text, out int height))
             terrainHeight = Mathf.Clamp(height, 10, 500);
 
-        // Store project data for transfer to main scene
-        ProjectDataTransfer.Instance.SetNewProjectData(projectName, terrainWidth, terrainHeight);
+        // Create project data
+        TerrainData terrainData = new TerrainData();
+        terrainData.Initialize(terrainWidth, terrainHeight);
 
-        Debug.Log($"Creating new project: {projectName} ({terrainWidth}x{terrainHeight})");
+        TerrainProject project = new TerrainProject();
+        project.Initialize(projectName, terrainData);
 
-        // Load main scene
-        MainMenuButtons mainMenu = FindFirstObjectByType<MainMenuButtons>();
-        if (mainMenu != null)
+        // Save project using TerrainSaveLoadManager with File Browser
+        TerrainSaveLoadManager saveLoadManager = FindFirstObjectByType<TerrainSaveLoadManager>();
+        if (saveLoadManager == null)
         {
-            mainMenu.LoadMainScene();
+            GameObject go = new GameObject("TerrainSaveLoadManager");
+            saveLoadManager = go.AddComponent<TerrainSaveLoadManager>();
+        }
+
+        // Show save dialog
+        string filePath = saveLoadManager.ShowSaveDialog(projectName);
+        
+        if (string.IsNullOrEmpty(filePath))
+        {
+            Debug.Log("Save cancelled by user");
+            return;
+        }
+
+        // Save project
+        if (saveLoadManager.SaveProject(project, filePath))
+        {
+            // Store file path in PlayerPrefs for tool scene
+            PlayerPrefs.SetString("TerrainEditor_ProjectPath", filePath);
+            PlayerPrefs.Save();
+
+            Debug.Log($"Project created and saved: {filePath}");
+
+            // Load main scene
+            UnityEngine.SceneManagement.SceneManager.LoadScene("main");
         }
         else
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("main");
+            Debug.LogError("Failed to save project!");
         }
     }
 
