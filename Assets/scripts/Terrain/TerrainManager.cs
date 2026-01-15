@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.IO;
 
 public class TerrainManager : MonoBehaviour
 {
@@ -29,9 +30,40 @@ public class TerrainManager : MonoBehaviour
 
     private void Start()
     {
-        // Check if we're loading from menu with project data
+        // Check if we're loading from menu with project path stored in PlayerPrefs
+        string projectPath = PlayerPrefs.GetString("TerrainEditor_ProjectPath", "");
+        
+        if (!string.IsNullOrEmpty(projectPath) && System.IO.File.Exists(projectPath))
+        {
+            // Load project from file
+            TerrainSaveLoadManager saveLoadManager = FindFirstObjectByType<TerrainSaveLoadManager>();
+            if (saveLoadManager == null)
+            {
+                GameObject go = new GameObject("TerrainSaveLoadManager");
+                saveLoadManager = go.AddComponent<TerrainSaveLoadManager>();
+            }
+            
+            if (saveLoadManager != null)
+            {
+                TerrainProject loadedProject = saveLoadManager.LoadProject(projectPath);
+                if (loadedProject != null)
+                {
+                    LoadTerrain(loadedProject);
+                    // Clear the PlayerPrefs after loading
+                    PlayerPrefs.DeleteKey("TerrainEditor_ProjectPath");
+                    PlayerPrefs.Save();
+                    return;
+                }
+            }
+            
+            // If loading failed, clear the pref and fall through to default
+            PlayerPrefs.DeleteKey("TerrainEditor_ProjectPath");
+            PlayerPrefs.Save();
+        }
+        
+        // Fallback: Check old ProjectDataTransfer (for backwards compatibility, can be removed later)
         ProjectDataTransfer transfer = ProjectDataTransfer.Instance;
-
+        
         if (transfer != null && transfer.isNewProject)
         {
             // Create new project with transferred data
