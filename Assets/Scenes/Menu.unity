@@ -2368,7 +2368,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'By: Martijn Laureijs
 
-    version: Beta'
+    version: Beta v2'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4370,13 +4370,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   projectNameInput: {fileID: 720246573}
-  savePathInput: {fileID: 1490088465}
   continueButton: {fileID: 402750919}
   cancelButton: {fileID: 579543002}
   terrainWidthInput: {fileID: 0}
   terrainHeightInput: {fileID: 0}
   defaultProjectName: New Project
-  defaultSavePath: C:/Projects/
   defaultTerrainSize: 100
 --- !u!1 &1481466354
 GameObject:
@@ -6071,6 +6069,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2039478608}
   - component: {fileID: 2039478607}
+  - component: {fileID: 2039478609}
   m_Layer: 0
   m_Name: MenuManager
   m_TagString: Untagged
@@ -6093,8 +6092,6 @@ MonoBehaviour:
   newProjectButton: {fileID: 1341739551}
   loadProjectButton: {fileID: 2034373573}
   exitButton: {fileID: 554390080}
-  newProjectPopup: {fileID: 1456354031}
-  mainSceneName: main
 --- !u!4 &2039478608
 Transform:
   m_ObjectHideFlags: 0
@@ -6110,6 +6107,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2039478609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039478606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4d5e6f708192a3b4c5d6e7f8094abcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainSceneName: main
+  mainMenuButtons: {fileID: 2039478607}
+  newProjectPopup: {fileID: 1456354035}
+  newProjectPopupRoot: {fileID: 1456354031}
+  saveLoadManager: {fileID: 120814422}
 --- !u!1 &2087313963
 GameObject:
   m_ObjectHideFlags: 0

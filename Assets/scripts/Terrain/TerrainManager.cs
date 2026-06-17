@@ -31,7 +31,7 @@ public class TerrainManager : MonoBehaviour
     private void Start()
     {
         // Check if we're loading from menu with project path stored in PlayerPrefs
-        string projectPath = PlayerPrefs.GetString("TerrainEditor_ProjectPath", "");
+        string projectPath = PlayerPrefs.GetString(MenuContext.ProjectPathPrefKey, "");
         
         if (!string.IsNullOrEmpty(projectPath) && System.IO.File.Exists(projectPath))
         {
@@ -50,14 +50,14 @@ public class TerrainManager : MonoBehaviour
                 {
                     LoadTerrain(loadedProject);
                     // Clear the PlayerPrefs after loading
-                    PlayerPrefs.DeleteKey("TerrainEditor_ProjectPath");
+                    PlayerPrefs.DeleteKey(MenuContext.ProjectPathPrefKey);
                     PlayerPrefs.Save();
                     return;
                 }
             }
             
             // If loading failed, clear the pref and fall through to default
-            PlayerPrefs.DeleteKey("TerrainEditor_ProjectPath");
+            PlayerPrefs.DeleteKey(MenuContext.ProjectPathPrefKey);
             PlayerPrefs.Save();
         }
         

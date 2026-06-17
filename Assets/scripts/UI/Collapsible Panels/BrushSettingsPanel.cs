@@ -13,6 +13,7 @@ public class BrushSettingsPanel : CollapsiblePanel
     [SerializeField] private TextMeshProUGUI brushSizeText;
     [SerializeField] private TextMeshProUGUI brushStrengthText;
     [SerializeField] private TextMeshProUGUI hotkeyFeedbackText;
+    [SerializeField] private TextMeshProUGUI tooltipText;
 
     [Header("References")]
     [SerializeField] private BrushManager brushManager;
@@ -31,6 +32,16 @@ public class BrushSettingsPanel : CollapsiblePanel
         collapsedPosition = new Vector2(expandedPosition.x, -panelHeight);
     }
 
+    private void Awake()
+    {
+        if (tooltipText == null && transform.parent != null)
+        {
+            Transform tooltipTransform = transform.parent.Find("Tooltip");
+            if (tooltipTransform != null)
+                tooltipText = tooltipTransform.GetComponent<TextMeshProUGUI>();
+        }
+    }
+
     private void Start()
     {
         if (brushManager == null)
@@ -40,6 +51,11 @@ public class BrushSettingsPanel : CollapsiblePanel
         {
             brushManager.OnBrushSizeChanged += OnBrushSizeChangedFromManager;
             brushManager.OnBrushStrengthChanged += OnBrushStrengthChangedFromManager;
+            brushManager.OnActiveBrushChanged += OnActiveBrushChanged;
+
+            TerrainBrush activeBrush = brushManager.GetActiveBrush();
+            if (activeBrush != null)
+                OnActiveBrushChanged(brushManager.ActiveBrushIndex, activeBrush);
         }
 
         if (brushSizeSlider != null)
@@ -68,7 +84,16 @@ public class BrushSettingsPanel : CollapsiblePanel
         {
             brushManager.OnBrushSizeChanged -= OnBrushSizeChangedFromManager;
             brushManager.OnBrushStrengthChanged -= OnBrushStrengthChangedFromManager;
+            brushManager.OnActiveBrushChanged -= OnActiveBrushChanged;
         }
+    }
+
+    private void OnActiveBrushChanged(int index, TerrainBrush brush)
+    {
+        if (tooltipText == null || brush == null)
+            return;
+
+        tooltipText.text = brush.BrushDescription;
     }
 
     private void OnBrushSizeChangedFromManager(float size)

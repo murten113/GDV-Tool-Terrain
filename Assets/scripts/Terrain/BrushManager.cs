@@ -24,9 +24,11 @@ public class BrushManager : MonoBehaviour
 
     public Action<float> OnBrushSizeChanged;
     public Action<float> OnBrushStrengthChanged;
+    public Action<int, TerrainBrush> OnActiveBrushChanged;
 
     private int activeBrushIndex;
     private TerrainRaycaster raycaster;
+    private TerrainManager terrainManager;
 
     public IReadOnlyList<TerrainBrush> Brushes => brushes;
     public int ActiveBrushIndex => activeBrushIndex;
@@ -43,6 +45,7 @@ public class BrushManager : MonoBehaviour
     private void Start()
     {
         raycaster = FindFirstObjectByType<TerrainRaycaster>();
+        terrainManager = FindFirstObjectByType<TerrainManager>();
 
         if (raycaster == null)
             Debug.LogError("BrushManager: TerrainRaycaster not found!");
@@ -64,6 +67,15 @@ public class BrushManager : MonoBehaviour
 
         activeBrushIndex = index;
         Debug.Log($"Active brush: {brushes[index].BrushName}");
+        OnActiveBrushChanged?.Invoke(activeBrushIndex, brushes[activeBrushIndex]);
+    }
+
+    public TerrainBrush GetActiveBrush()
+    {
+        if (brushes.Count == 0 || activeBrushIndex < 0 || activeBrushIndex >= brushes.Count)
+            return null;
+
+        return brushes[activeBrushIndex];
     }
 
     public void SetActiveBrush(TerrainBrush brush)
@@ -80,10 +92,51 @@ public class BrushManager : MonoBehaviour
 
     private void Update()
     {
+        HandleBrushHotkeys();
         HandleScrollWheelAdjustments();
+
+        if (Input.GetMouseButtonDown(0) && !UIInputUtility.IsPointerOverUI())
+            BeginActiveStroke();
 
         if (Input.GetMouseButton(0) && !UIInputUtility.IsPointerOverUI())
             Paint();
+
+        if (Input.GetMouseButtonUp(0))
+            EndActiveStroke();
+    }
+
+    private void HandleBrushHotkeys()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1) && brushes.Count > 0) SetActiveBrush(0);
+        if (Input.GetKeyDown(KeyCode.Alpha2) && brushes.Count > 1) SetActiveBrush(1);
+        if (Input.GetKeyDown(KeyCode.Alpha3) && brushes.Count > 2) SetActiveBrush(2);
+        if (Input.GetKeyDown(KeyCode.Alpha4) && brushes.Count > 3) SetActiveBrush(3);
+        if (Input.GetKeyDown(KeyCode.Alpha5) && brushes.Count > 4) SetActiveBrush(4);
+    }
+
+    private void BeginActiveStroke()
+    {
+        if (raycaster == null || terrainManager == null || brushes.Count == 0)
+            return;
+
+        if (!raycaster.RaycastTerrain(out Vector3 hitPoint, out _))
+            return;
+
+        TerrainData data = terrainManager.CurrentTerrainData;
+        if (data == null)
+            return;
+
+        int centerX = Mathf.FloorToInt(hitPoint.x / data.horizontalScale);
+        int centerY = Mathf.FloorToInt(hitPoint.z / data.horizontalScale);
+        brushes[activeBrushIndex].BeginStroke(data, centerX, centerY);
+    }
+
+    private void EndActiveStroke()
+    {
+        if (brushes.Count == 0)
+            return;
+
+        brushes[activeBrushIndex].EndStroke();
     }
 
     private void HandleScrollWheelAdjustments()
@@ -132,7 +185,7 @@ public class BrushManager : MonoBehaviour
     public void SetBrushStrength(float strength)
     {
         brushStrength = strength;
-        OnBrushStrengthChanged?.Invoke(brushStrength);
+        OnBrushStrengthChanged?.Invoke(strength);
     }
 
     public float GetBrushSize() => brushSize;

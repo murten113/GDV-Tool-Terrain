@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class SmoothBrush : TerrainBrush
 {
+    protected override string GetDefaultDescription() =>
+        "Softens bumps by blending each point with its neighbors. Good for polishing rough shapes.";
+
     public override float ComputeHeight(float currentHeight, TerrainData data, int x, int y, BrushStrokeContext context)
     {
         float averageHeight = GetAverageNeighborHeight(data, x, y);

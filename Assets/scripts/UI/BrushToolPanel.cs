@@ -4,12 +4,14 @@ using UnityEngine.UI;
 public class BrushToolPanel : MonoBehaviour
 {
     [Header("Brush Buttons")]
-    [SerializeField] private Button raiseButton;
-    [SerializeField] private Button lowerButton;
-    [SerializeField] private Button smoothButton;
+    [SerializeField] private Button[] brushButtons;
 
     [Header("References")]
     [SerializeField] private BrushManager brushManager;
+
+    [Header("Highlight")]
+    [SerializeField] private Color activeButtonColor = new Color(0f, 1f, 1f, 1f);
+    [SerializeField] private Color inactiveButtonColor = Color.white;
 
     private Button currentActiveButton;
 
@@ -18,43 +20,73 @@ public class BrushToolPanel : MonoBehaviour
         if (brushManager == null)
             brushManager = FindFirstObjectByType<BrushManager>();
 
-        if (raiseButton != null)
-            raiseButton.onClick.AddListener(() => SelectBrush(0, raiseButton));
+        if (brushButtons != null)
+        {
+            for (int i = 0; i < brushButtons.Length; i++)
+            {
+                if (brushButtons[i] == null)
+                    continue;
 
-        if (lowerButton != null)
-            lowerButton.onClick.AddListener(() => SelectBrush(1, lowerButton));
+                int index = i;
+                brushButtons[i].onClick.AddListener(() => SelectBrush(index));
+            }
+        }
 
-        if (smoothButton != null)
-            smoothButton.onClick.AddListener(() => SelectBrush(2, smoothButton));
-
-        if (brushManager != null && brushManager.Brushes.Count > 0)
-            SetActiveButton(raiseButton);
-    }
-
-    private void SelectBrush(int index, Button button)
-    {
         if (brushManager != null)
         {
-            brushManager.SetActiveBrush(index);
-            SetActiveButton(button);
+            brushManager.OnActiveBrushChanged += OnActiveBrushChanged;
+            TerrainBrush activeBrush = brushManager.GetActiveBrush();
+            if (activeBrush != null)
+                OnActiveBrushChanged(brushManager.ActiveBrushIndex, activeBrush);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (brushManager != null)
+            brushManager.OnActiveBrushChanged -= OnActiveBrushChanged;
+    }
+
+    private void SelectBrush(int index)
+    {
+        if (brushManager != null)
+            brushManager.SetActiveBrush(index);
+    }
+
+    private void OnActiveBrushChanged(int index, TerrainBrush brush)
+    {
+        if (brushButtons == null || index < 0 || index >= brushButtons.Length)
+            return;
+
+        SetActiveButton(brushButtons[index]);
     }
 
     private void SetActiveButton(Button activeButton)
     {
-        if (currentActiveButton != null)
+        if (brushButtons == null)
+            return;
+
+        foreach (Button button in brushButtons)
         {
-            ColorBlock colors = currentActiveButton.colors;
-            colors.normalColor = Color.white;
-            currentActiveButton.colors = colors;
+            if (button == null)
+                continue;
+
+            ApplyButtonHighlight(button, button == activeButton);
         }
 
-        if (activeButton != null)
-        {
-            currentActiveButton = activeButton;
-            ColorBlock colors = activeButton.colors;
-            colors.normalColor = Color.cyan;
-            activeButton.colors = colors;
-        }
+        currentActiveButton = activeButton;
+    }
+
+    private void ApplyButtonHighlight(Button button, bool active)
+    {
+        Color color = active ? activeButtonColor : inactiveButtonColor;
+
+        ColorBlock colors = button.colors;
+        colors.normalColor = color;
+        colors.selectedColor = color;
+        button.colors = colors;
+
+        if (button.targetGraphic != null)
+            button.targetGraphic.color = color;
     }
 }
