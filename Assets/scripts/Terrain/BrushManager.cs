@@ -13,23 +13,16 @@ public class BrushManager : MonoBehaviour
     [SerializeField] private float brushSize = 5f;
     [SerializeField] private float brushStrength = 1f;
 
-
-    [Header("Hotkey Settings")]
-    [SerializeField] private float sizeAdjustSpeed = 0.5f;
-    [SerializeField] private float strengthAdjustSpeed = 0.1f;
+    [Header("Scroll Hotkeys")]
+    [SerializeField] private float sizeScrollSpeed = 2f;
+    [SerializeField] private float strengthScrollSpeed = 0.25f;
     [SerializeField] private float minBrushSize = 0.5f;
     [SerializeField] private float maxBrushSize = 50f;
     [SerializeField] private float minBrushStrength = 0.1f;
     [SerializeField] private float maxBrushStrength = 10f;
 
-    private bool isAdjustingSize = false;
-    private bool isAdjustingStrength = false;
-
-    // Events for UI updates
-    public System.Action<float> OnBrushSizeChanged;
-    public System.Action<float> OnBrushStrengthChanged;
-    public System.Action<bool> OnSizeAdjustModeChanged; // true = adjusting size
-    public System.Action<bool> OnStrengthAdjustModeChanged; // true = adjusting strength
+    public Action<float> OnBrushSizeChanged;
+    public Action<float> OnBrushStrengthChanged;
 
     private Dictionary<Type, BaseBrush> brushes = new Dictionary<Type, BaseBrush>();
     private Type currentBrushType;
@@ -46,13 +39,10 @@ public class BrushManager : MonoBehaviour
         RegisterBrush(typeof(RaiseBrush), raiseBrush);
         RegisterBrush(typeof(LowerBrush), lowerBrush);
         RegisterBrush(typeof(SmoothBrush), smoothBrush);
-        
-        // Set default brush
+
         if (brushes.Count > 0)
-        {
             SetActiveBrush(typeof(RaiseBrush));
-        }
-        
+
         UpdateBrushSettings();
     }
 
@@ -74,7 +64,6 @@ public class BrushManager : MonoBehaviour
         Debug.Log($"Registered brush: {brushType.Name}");
     }
 
-    // Set active brush by Type
     public void SetActiveBrush(Type brushType)
     {
         if (!brushes.ContainsKey(brushType))
@@ -90,114 +79,61 @@ public class BrushManager : MonoBehaviour
         Debug.Log($"Active brush: {brushType.Name}");
     }
 
-    // Get active brush type
     public Type GetActiveBrushType() => currentBrushType;
 
     private void Update()
     {
-        // Handle hotkey adjustments
-        HandleHotkeys();
+        HandleScrollWheelAdjustments();
 
-        // Handle brush size adjustment
-        if (isAdjustingSize)
+        if (Input.GetMouseButton(0) && currentBrush != null && !UIInputUtility.IsPointerOverUI())
+            Paint();
+    }
+
+    private void HandleScrollWheelAdjustments()
+    {
+        if (UIInputUtility.IsPointerOverUI())
+            return;
+
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (Mathf.Abs(scroll) < 0.01f)
+            return;
+
+        bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        bool ctrlHeld = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+
+        if (shiftHeld && !ctrlHeld)
         {
-            float mouseDelta = Input.GetAxis("Mouse X") + Input.GetAxis("Mouse Y");
-            float newSize = brushSize + (mouseDelta * sizeAdjustSpeed);
+            float newSize = brushSize + scroll * sizeScrollSpeed;
             SetBrushSize(Mathf.Clamp(newSize, minBrushSize, maxBrushSize));
         }
-
-        // Handle brush strength adjustment
-        if (isAdjustingStrength)
+        else if (ctrlHeld && !shiftHeld)
         {
-            float mouseDelta = Input.GetAxis("Mouse X") + Input.GetAxis("Mouse Y");
-            float newStrength = brushStrength + (mouseDelta * strengthAdjustSpeed);
+            float newStrength = brushStrength + scroll * strengthScrollSpeed;
             SetBrushStrength(Mathf.Clamp(newStrength, minBrushStrength, maxBrushStrength));
         }
-
-        // Check if we should paint
-        if (Input.GetMouseButton(0) && currentBrush != null && !isAdjustingSize && !isAdjustingStrength
-            && !UIInputUtility.IsPointerOverUI())
-        {
-            Paint();
-        }
-
     }
 
-    private void HandleHotkeys()
-    {
-        bool wasAdjustingSize = isAdjustingSize;
-        bool wasAdjustingStrength = isAdjustingStrength;
-
-        // F key: Toggle size adjustment
-        if (Input.GetKeyDown(KeyCode.F) && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
-        {
-            isAdjustingSize = !isAdjustingSize;
-            isAdjustingStrength = false; // Cancel strength adjustment
-            
-            if (isAdjustingSize != wasAdjustingSize)
-            {
-                OnSizeAdjustModeChanged?.Invoke(isAdjustingSize);
-                Debug.Log(isAdjustingSize ? "Brush Size Adjustment Mode: ON (Move mouse to adjust)" : "Brush Size Adjustment Mode: OFF");
-            }
-        }
-        
-        // Shift+F key: Toggle strength adjustment
-        if (Input.GetKeyDown(KeyCode.F) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
-        {
-            isAdjustingStrength = !isAdjustingStrength;
-            isAdjustingSize = false; // Cancel size adjustment
-            
-            if (isAdjustingStrength != wasAdjustingStrength)
-            {
-                OnStrengthAdjustModeChanged?.Invoke(isAdjustingStrength);
-                Debug.Log(isAdjustingStrength ? "Brush Strength Adjustment Mode: ON (Move mouse to adjust)" : "Brush Strength Adjustment Mode: OFF");
-            }
-        }
-
-        // Exit adjustment modes on mouse click or Escape
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (isAdjustingSize || isAdjustingStrength)
-            {
-                bool wasSize = isAdjustingSize;
-                bool wasStrength = isAdjustingStrength;
-                isAdjustingSize = false;
-                isAdjustingStrength = false;
-                
-                if (wasSize) OnSizeAdjustModeChanged?.Invoke(false);
-                if (wasStrength) OnStrengthAdjustModeChanged?.Invoke(false);
-            }
-        }
-    }
-
-    // Paint at mouse position
     private void Paint()
     {
         if (raycaster == null || currentBrush == null)
             return;
 
-        Vector3 hitPoint;
-        Vector3 hitNormal;
-
-        if (raycaster.RaycastTerrain(out hitPoint, out hitNormal))
-        {
+        if (raycaster.RaycastTerrain(out Vector3 hitPoint, out Vector3 hitNormal))
             currentBrush.ApplyBrush(hitPoint);
-        }
     }
 
-    // Update brush settings (size and strength)
     public void SetBrushSize(float size)
     {
         brushSize = size;
         UpdateBrushSettings();
-        OnBrushSizeChanged?.Invoke(brushSize); // Notify UI
+        OnBrushSizeChanged?.Invoke(brushSize);
     }
 
     public void SetBrushStrength(float strength)
     {
         brushStrength = strength;
         UpdateBrushSettings();
-        OnBrushStrengthChanged?.Invoke(brushStrength); // Notify UI
+        OnBrushStrengthChanged?.Invoke(brushStrength);
     }
 
     private void UpdateBrushSettings()

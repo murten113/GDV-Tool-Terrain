@@ -7200,8 +7200,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Middle mouse = pan cam\n\nRight mouse = rotate cam\n\nClick F and move
-    mouse \nto change size\n\nClick Shift + F and move mouse \nto change strength"
+  m_text: "Middle mouse = pan cam\n\nRight mouse = rotate cam\n\nShift + scroll = brush
+    size\n\nCtrl + scroll = brush strength"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -10361,8 +10361,8 @@ MonoBehaviour:
   smoothBrush: {fileID: 415214292}
   brushSize: 5
   brushStrength: 1
-  sizeAdjustSpeed: 0.5
-  strengthAdjustSpeed: 0.1
+  sizeScrollSpeed: 2
+  strengthScrollSpeed: 0.25
   minBrushSize: 0.5
   maxBrushSize: 50
   minBrushStrength: 0.1

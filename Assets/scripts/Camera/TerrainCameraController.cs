@@ -107,6 +107,11 @@ public class TerrainCameraController : MonoBehaviour
 
     private void HandleZoom()
     {
+        bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        bool ctrlHeld = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+        if (shiftHeld || ctrlHeld)
+            return;
+
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (Mathf.Abs(scroll) > 0.01f)
         {
