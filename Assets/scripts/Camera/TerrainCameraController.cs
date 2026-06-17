@@ -49,6 +49,9 @@ public class TerrainCameraController : MonoBehaviour
 
     private void Update()
     {
+        if (UIInputUtility.IsPointerOverUI())
+            return;
+
         HandleRotation();
         HandlePan();
         HandleZoom();

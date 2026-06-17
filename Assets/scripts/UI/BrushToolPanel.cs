@@ -6,7 +6,7 @@ public class BrushToolPanel : MonoBehaviour
     [Header("Brush Buttons")]
     [SerializeField] private Button raiseButton;
     [SerializeField] private Button lowerButton;
-    [SerializeField] private Button flattenButton;
+    [SerializeField] private Button smoothButton;
 
     [Header("References")]
     [SerializeField] private BrushManager brushManager;
@@ -24,8 +24,8 @@ public class BrushToolPanel : MonoBehaviour
         if (lowerButton != null)
             lowerButton.onClick.AddListener(() => OnLowerBrushClicked());
 
-        if (flattenButton != null)
-            flattenButton.onClick.AddListener(() => OnFlattenBrushClicked());
+        if (smoothButton != null)
+            smoothButton.onClick.AddListener(() => OnSmoothBrushClicked());
     }
 
     private void OnRaiseBrushClicked()
@@ -46,12 +46,12 @@ public class BrushToolPanel : MonoBehaviour
         }
     }
 
-    private void OnFlattenBrushClicked()
+    private void OnSmoothBrushClicked()
     {
         if (brushManager != null)
         {
-            brushManager.SetActiveBrush(typeof(FlattenBrush));
-            SetActiveButton(flattenButton);
+            brushManager.SetActiveBrush(typeof(SmoothBrush));
+            SetActiveButton(smoothButton);
         }
     }
 

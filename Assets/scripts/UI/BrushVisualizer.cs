@@ -59,6 +59,13 @@ public class BrushVisualizer : MonoBehaviour
 
     private void Update()
     {
+        if (UIInputUtility.IsPointerOverUI())
+        {
+            showBrush = false;
+            lineRenderer.enabled = false;
+            return;
+        }
+
         // Track mouse position
         if (raycaster != null && raycaster.RaycastTerrain(out Vector3 hitPoint, out Vector3 hitNormal))
         {

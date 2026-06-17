@@ -7,7 +7,7 @@ public class BrushManager : MonoBehaviour
     [Header("Brush References")]
     [SerializeField] private RaiseBrush raiseBrush;
     [SerializeField] private LowerBrush lowerBrush;
-    [SerializeField] private FlattenBrush flattenBrush;
+    [SerializeField] private SmoothBrush smoothBrush;
 
     [Header("Settings")]
     [SerializeField] private float brushSize = 5f;
@@ -45,7 +45,7 @@ public class BrushManager : MonoBehaviour
 
         RegisterBrush(typeof(RaiseBrush), raiseBrush);
         RegisterBrush(typeof(LowerBrush), lowerBrush);
-        RegisterBrush(typeof(FlattenBrush), flattenBrush);
+        RegisterBrush(typeof(SmoothBrush), smoothBrush);
         
         // Set default brush
         if (brushes.Count > 0)
@@ -83,14 +83,6 @@ public class BrushManager : MonoBehaviour
             return;
         }
 
-        // Reset flatten brush if switching away
-        if (currentBrush != null && currentBrush.GetType() == typeof(FlattenBrush))
-        {
-            FlattenBrush flatten = currentBrush as FlattenBrush;
-            if (flatten != null)
-                flatten.ResetFlattenHeight();
-        }
-
         currentBrushType = brushType;
         currentBrush = brushes[brushType];
         UpdateBrushSettings();
@@ -123,16 +115,12 @@ public class BrushManager : MonoBehaviour
         }
 
         // Check if we should paint
-        if (Input.GetMouseButton(0) && currentBrush != null && !isAdjustingSize && !isAdjustingStrength)
+        if (Input.GetMouseButton(0) && currentBrush != null && !isAdjustingSize && !isAdjustingStrength
+            && !UIInputUtility.IsPointerOverUI())
         {
             Paint();
         }
 
-        // Reset flatten height when mouse is released
-        if (Input.GetMouseButtonUp(0) && flattenBrush != null)
-        {
-            flattenBrush.ResetFlattenHeight();
-        }
     }
 
     private void HandleHotkeys()
@@ -226,10 +214,10 @@ public class BrushManager : MonoBehaviour
             lowerBrush.brushStrength = brushStrength;
         }
 
-        if (flattenBrush != null)
+        if (smoothBrush != null)
         {
-            flattenBrush.brushSize = brushSize;
-            flattenBrush.brushStrength = brushStrength;
+            smoothBrush.brushSize = brushSize;
+            smoothBrush.brushStrength = brushStrength;
         }
     }
 
