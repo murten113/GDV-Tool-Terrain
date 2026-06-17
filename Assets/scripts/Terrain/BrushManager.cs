@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class BrushManager : MonoBehaviour
 {
-    [Header("Brush References")]
-    [SerializeField] private RaiseBrush raiseBrush;
-    [SerializeField] private LowerBrush lowerBrush;
-    [SerializeField] private SmoothBrush smoothBrush;
+    [Header("Brushes")]
+    [SerializeField] private List<TerrainBrush> brushes = new List<TerrainBrush>();
+
+    [Header("References")]
+    [SerializeField] private TerrainPainter terrainPainter;
 
     [Header("Settings")]
     [SerializeField] private float brushSize = 5f;
@@ -24,10 +25,20 @@ public class BrushManager : MonoBehaviour
     public Action<float> OnBrushSizeChanged;
     public Action<float> OnBrushStrengthChanged;
 
-    private Dictionary<Type, BaseBrush> brushes = new Dictionary<Type, BaseBrush>();
-    private Type currentBrushType;
-    private BaseBrush currentBrush;
+    private int activeBrushIndex;
     private TerrainRaycaster raycaster;
+
+    public IReadOnlyList<TerrainBrush> Brushes => brushes;
+    public int ActiveBrushIndex => activeBrushIndex;
+
+    private void Awake()
+    {
+        if (terrainPainter == null)
+            terrainPainter = GetComponent<TerrainPainter>();
+
+        if (terrainPainter == null)
+            terrainPainter = FindFirstObjectByType<TerrainPainter>();
+    }
 
     private void Start()
     {
@@ -36,56 +47,42 @@ public class BrushManager : MonoBehaviour
         if (raycaster == null)
             Debug.LogError("BrushManager: TerrainRaycaster not found!");
 
-        RegisterBrush(typeof(RaiseBrush), raiseBrush);
-        RegisterBrush(typeof(LowerBrush), lowerBrush);
-        RegisterBrush(typeof(SmoothBrush), smoothBrush);
+        if (terrainPainter == null)
+            Debug.LogError("BrushManager: TerrainPainter not found!");
 
         if (brushes.Count > 0)
-            SetActiveBrush(typeof(RaiseBrush));
-
-        UpdateBrushSettings();
+            SetActiveBrush(0);
     }
 
-    public void RegisterBrush(Type brushType, BaseBrush brushInstance)
+    public void SetActiveBrush(int index)
     {
-        if (brushInstance == null)
+        if (index < 0 || index >= brushes.Count)
         {
-            Debug.LogWarning($"cannot register null brush instance for type {brushType}");
+            Debug.LogError($"Brush index {index} is out of range!");
             return;
         }
 
-        if (!brushType.IsSubclassOf(typeof(BaseBrush)) && brushType != typeof(BaseBrush))
-        {
-            Debug.LogError($"Type {brushType} is not a subclass of BaseBrush");
-            return;
-        }
-
-        brushes[brushType] = brushInstance;
-        Debug.Log($"Registered brush: {brushType.Name}");
+        activeBrushIndex = index;
+        Debug.Log($"Active brush: {brushes[index].BrushName}");
     }
 
-    public void SetActiveBrush(Type brushType)
+    public void SetActiveBrush(TerrainBrush brush)
     {
-        if (!brushes.ContainsKey(brushType))
+        int index = brushes.IndexOf(brush);
+        if (index < 0)
         {
-            Debug.LogError($"Brush type {brushType} not registered!");
+            Debug.LogError($"Brush {brush.name} is not registered in the brush list!");
             return;
         }
 
-        currentBrushType = brushType;
-        currentBrush = brushes[brushType];
-        UpdateBrushSettings();
-
-        Debug.Log($"Active brush: {brushType.Name}");
+        SetActiveBrush(index);
     }
-
-    public Type GetActiveBrushType() => currentBrushType;
 
     private void Update()
     {
         HandleScrollWheelAdjustments();
 
-        if (Input.GetMouseButton(0) && currentBrush != null && !UIInputUtility.IsPointerOverUI())
+        if (Input.GetMouseButton(0) && !UIInputUtility.IsPointerOverUI())
             Paint();
     }
 
@@ -115,46 +112,27 @@ public class BrushManager : MonoBehaviour
 
     private void Paint()
     {
-        if (raycaster == null || currentBrush == null)
+        if (raycaster == null || terrainPainter == null || brushes.Count == 0)
             return;
 
-        if (raycaster.RaycastTerrain(out Vector3 hitPoint, out Vector3 hitNormal))
-            currentBrush.ApplyBrush(hitPoint);
+        ITerrainBrush activeBrush = brushes[activeBrushIndex];
+        if (activeBrush == null)
+            return;
+
+        if (raycaster.RaycastTerrain(out Vector3 hitPoint, out _))
+            terrainPainter.ApplyBrush(activeBrush, hitPoint, brushSize, brushStrength);
     }
 
     public void SetBrushSize(float size)
     {
         brushSize = size;
-        UpdateBrushSettings();
         OnBrushSizeChanged?.Invoke(brushSize);
     }
 
     public void SetBrushStrength(float strength)
     {
         brushStrength = strength;
-        UpdateBrushSettings();
         OnBrushStrengthChanged?.Invoke(brushStrength);
-    }
-
-    private void UpdateBrushSettings()
-    {
-        if (raiseBrush != null)
-        {
-            raiseBrush.brushSize = brushSize;
-            raiseBrush.brushStrength = brushStrength;
-        }
-
-        if (lowerBrush != null)
-        {
-            lowerBrush.brushSize = brushSize;
-            lowerBrush.brushStrength = brushStrength;
-        }
-
-        if (smoothBrush != null)
-        {
-            smoothBrush.brushSize = brushSize;
-            smoothBrush.brushStrength = brushStrength;
-        }
     }
 
     public float GetBrushSize() => brushSize;

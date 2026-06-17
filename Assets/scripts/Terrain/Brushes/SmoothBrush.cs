@@ -1,53 +1,12 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class SmoothBrush : BaseBrush
+public class SmoothBrush : TerrainBrush
 {
-    public override void ApplyBrush(Vector3 worldPosition)
+    public override float ComputeHeight(float currentHeight, TerrainData data, int x, int y, BrushStrokeContext context)
     {
-        if (terrainManager == null || terrainManager.CurrentTerrainData == null)
-            return;
-
-        TerrainData data = terrainManager.CurrentTerrainData;
-
-        int centerX = Mathf.FloorToInt(worldPosition.x / data.horizontalScale);
-        int centerY = Mathf.FloorToInt(worldPosition.z / data.horizontalScale);
-        int brushRadius = Mathf.CeilToInt(brushSize / data.horizontalScale);
-
-        var updates = new List<(int x, int y, float height)>();
-
-        for (int y = -brushRadius; y <= brushRadius; y++)
-        {
-            for (int x = -brushRadius; x <= brushRadius; x++)
-            {
-                int heightmapX = centerX + x;
-                int heightmapY = centerY + y;
-
-                float worldDistance = Mathf.Sqrt(x * x + y * y) * data.horizontalScale;
-                if (worldDistance > brushSize)
-                    continue;
-
-                float gridDistance = Mathf.Sqrt(x * x + y * y);
-                if (gridDistance > brushRadius)
-                    continue;
-
-                float falloff = Mathf.Clamp01(1f - (gridDistance / brushRadius));
-                float currentHeight = data.GetHeight(heightmapX, heightmapY);
-                float averageHeight = GetAverageNeighborHeight(data, heightmapX, heightmapY);
-                float influence = falloff * brushStrength * Time.deltaTime;
-                float newHeight = Mathf.Lerp(currentHeight, averageHeight, influence);
-
-                updates.Add((heightmapX, heightmapY, newHeight));
-            }
-        }
-
-        if (updates.Count == 0)
-            return;
-
-        foreach (var (x, y, height) in updates)
-            data.SetHeight(x, y, height);
-
-        terrainManager.UpdateMesh();
+        float averageHeight = GetAverageNeighborHeight(data, x, y);
+        float influence = context.Falloff * context.BrushStrength * context.DeltaTime;
+        return Mathf.Lerp(currentHeight, averageHeight, influence);
     }
 
     private static float GetAverageNeighborHeight(TerrainData data, int x, int y)

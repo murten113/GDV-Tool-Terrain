@@ -1,13 +1,9 @@
 using UnityEngine;
 
-public class LowerBrush : BaseBrush
+public class LowerBrush : TerrainBrush
 {
-    public override void ApplyBrush(Vector3 worldPosition)
+    public override float ComputeHeight(float currentHeight, TerrainData data, int x, int y, BrushStrokeContext context)
     {
-        ModifyHeightmap(worldPosition, brushStrength, (currentHeight, strength) =>
-        {
-            // Lower: subtract from current height
-            return currentHeight - strength * Time.deltaTime;
-        });
+        return currentHeight - context.Falloff * context.BrushStrength * context.DeltaTime;
     }
 }

@@ -2941,8 +2941,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brushSize: 5
-  brushStrength: 1
+  brushName: Smooth
 --- !u!4 &415214293
 Transform:
   m_ObjectHideFlags: 0
@@ -3160,8 +3159,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4681a636db676da468bf5949f7f6cbb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brushSize: 5
-  brushStrength: 1
+  brushName: Raise
 --- !u!4 &511531415
 Transform:
   m_ObjectHideFlags: 0
@@ -5772,8 +5770,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8adbf2c41002a2c4fa3fead16634987f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brushSize: 5
-  brushStrength: 1
+  brushName: Lower
 --- !u!4 &1071150951
 Transform:
   m_ObjectHideFlags: 0
@@ -10337,6 +10334,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1952950403}
   - component: {fileID: 1952950402}
+  - component: {fileID: 1952950404}
   m_Layer: 0
   m_Name: BrushManager
   m_TagString: Untagged
@@ -10356,9 +10354,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27d1ec9d0f1f1c64da419feb8e897240, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  raiseBrush: {fileID: 511531414}
-  lowerBrush: {fileID: 1071150950}
-  smoothBrush: {fileID: 415214292}
+  brushes:
+  - {fileID: 511531414}
+  - {fileID: 1071150950}
+  - {fileID: 415214292}
+  terrainPainter: {fileID: 1952950404}
   brushSize: 5
   brushStrength: 1
   sizeScrollSpeed: 2
@@ -10367,6 +10367,18 @@ MonoBehaviour:
   maxBrushSize: 50
   minBrushStrength: 0.1
   maxBrushStrength: 10
+--- !u!114 &1952950404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952950401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3c4d5e6f708192a3b4c5d6e7f8093ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1952950403
 Transform:
   m_ObjectHideFlags: 0

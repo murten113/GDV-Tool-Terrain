@@ -15,50 +15,33 @@ public class BrushToolPanel : MonoBehaviour
 
     private void Start()
     {
-        if(brushManager == null)
+        if (brushManager == null)
             brushManager = FindFirstObjectByType<BrushManager>();
 
         if (raiseButton != null)
-            raiseButton.onClick.AddListener(() => OnRaiseBrushClicked());
+            raiseButton.onClick.AddListener(() => SelectBrush(0, raiseButton));
 
         if (lowerButton != null)
-            lowerButton.onClick.AddListener(() => OnLowerBrushClicked());
+            lowerButton.onClick.AddListener(() => SelectBrush(1, lowerButton));
 
         if (smoothButton != null)
-            smoothButton.onClick.AddListener(() => OnSmoothBrushClicked());
-    }
+            smoothButton.onClick.AddListener(() => SelectBrush(2, smoothButton));
 
-    private void OnRaiseBrushClicked()
-    {
-        if (brushManager != null)
-        {
-            brushManager.SetActiveBrush(typeof(RaiseBrush));
+        if (brushManager != null && brushManager.Brushes.Count > 0)
             SetActiveButton(raiseButton);
-        }
     }
 
-    private void OnLowerBrushClicked()
+    private void SelectBrush(int index, Button button)
     {
         if (brushManager != null)
         {
-            brushManager.SetActiveBrush(typeof(LowerBrush));
-            SetActiveButton(lowerButton);
+            brushManager.SetActiveBrush(index);
+            SetActiveButton(button);
         }
     }
 
-    private void OnSmoothBrushClicked()
-    {
-        if (brushManager != null)
-        {
-            brushManager.SetActiveBrush(typeof(SmoothBrush));
-            SetActiveButton(smoothButton);
-        }
-    }
-
-    // Visual feedback for active brush
     private void SetActiveButton(Button activeButton)
     {
-        // Reset previous active button color
         if (currentActiveButton != null)
         {
             ColorBlock colors = currentActiveButton.colors;
@@ -66,12 +49,11 @@ public class BrushToolPanel : MonoBehaviour
             currentActiveButton.colors = colors;
         }
 
-        // Set new active button color
         if (activeButton != null)
         {
             currentActiveButton = activeButton;
             ColorBlock colors = activeButton.colors;
-            colors.normalColor = Color.cyan; // Highlight active brush
+            colors.normalColor = Color.cyan;
             activeButton.colors = colors;
         }
     }
